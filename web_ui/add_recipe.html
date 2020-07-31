@@ -2,11 +2,171 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Aggiungi ricetta</title>
-</head>
-<body>
-    <form action="">
 
-    </form>
+    <link rel="stylesheet" href="css/w3.css"/>
+    <link rel="stylesheet" href="css/w3-theme-amber.css"/>
+    <link rel="stylesheet" href="css/main.css"/>
+</head>
+<body class="w3-auto w3-theme-light">
+<div class="w3-card w3-margin main-container">
+    <div class="w3-row">
+        <div class="w3-third w3-brown"><img class="w3-image w3-block" src="images/bg-heading-02.jpg"></div>
+        <div class="w3-rest w3-container w3-theme">
+            <h1 class="w3-container">Aggiungi ricetta</h1>
+            <form class="w3-container">
+                <p>
+                    <label>Titolo ricetta</label>
+                    <input type="text" class="w3-input w3-sand w3-border">
+                </p>
+                <div class="w3-row">
+                    <div class="w3-col w3-half">
+                        <label>Tipo di portata</label>
+                        <select class="w3-select w3-border w3-sand">
+                            <option value="dolce">Dolce</option>
+                        </select>
+                    </div>
+                    <div class="w3-col w3-half">
+                        <label>Tempo di preparazione</label>
+                        <input type="number" class="w3-input w3-sand w3-border">
+                    </div>
+                </div>
+                <div>
+                    <p>
+                        <label>Stagionalità suggerita</label>
+                    </p>
+                    <div class="w3-row">
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">gen</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">feb</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">mar</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">apr</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">mag</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">giu</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">lug</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">ago</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">set</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">ott</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">nov</label>
+                        </div>
+                        <div class="w3-col l1 m1 s2 w3-center">
+                            <input type="checkbox" class="w3-check">
+                            <label class="w3-block">dic</label>
+                        </div>
+                    </div>
+                    <div class="w3-row w3-bar">
+                        <!--                        <div class="w3-col l2 m2 s6 w3-center w3-container">-->
+                        <!--                            <button class="w3-button w3-center w3-border w3-round-large w3-block">Primavera</button>-->
+                        <!--                        </div>-->
+                        <!--                        <div class="w3-col l2 m2 s6 w3-center w3-container">-->
+                        <!--                            <button class="w3-button w3-center w3-border w3-round-large w3-block">Estate</button>-->
+                        <!--                        </div>-->
+                        <!--                        <div class="w3-col l2 m2 s6 w3-center w3-container">-->
+                        <!--                            <button class="w3-button w3-center w3-border w3-round-large w3-block">Autunno</button>-->
+                        <!--                        </div>-->
+                        <!--                        <div class="w3-col l2 m2 s6 w3-center w3-container">-->
+                        <!--                            <button class="w3-button w3-center w3-border w3-round-large w3-block">Inverno</button>-->
+                        <!--                        </div>-->
+                        <!--                        <div class="w3-col l2 m2 s6 w3-center w3-container">-->
+                        <!--                            <button class="w3-button w3-center w3-border w3-round-large w3-block">Tutto</button>-->
+                        <!--                        </div>-->
+                        <!--                        <div class="w3-col l2 m2 s6 w3-center w3-container">-->
+                        <!--                            <button class="w3-button w3-center w3-border w3-round-large w3-block">Niente</button>-->
+                        <!--                        </div>-->
+                        <button class="w3-button w3-col l2 m2 s6 w3-center w3-round-large w3-padding-small w3-amber w3-hover-red">
+                            Primavera
+                        </button>
+                        <button class="w3-button w3-col l2 m2 s6 w3-center w3-round-large w3-padding-small w3-amber w3-hover-red">
+                            Estate
+                        </button>
+                        <button class="w3-button w3-col l2 m2 s6 w3-center w3-round-large w3-padding-small w3-amber w3-hover-red">
+                            Autunno
+                        </button>
+                        <button class="w3-button w3-col l2 m2 s6 w3-center w3-round-large w3-padding-small w3-amber w3-hover-red">
+                            Inverno
+                        </button>
+                        <button class="w3-button w3-col l2 m2 s6 w3-center w3-round-large w3-padding-small w3-amber w3-hover-red">
+                            Tutto
+                        </button>
+                        <button class="w3-button w3-col l2 m2 s6 w3-center w3-round-large w3-padding-small w3-amber w3-hover-red">
+                            Niente
+                        </button>
+                    </div>
+                </div>
+                <p>
+                    <label>Ulteriori categorie</label>
+                    <input type="text" class="w3-input w3-sand w3-border">
+                </p>
+                <div class="w3-container">
+                    <fieldset>
+                        <legend>parte principale</legend>
+                        <input type="text" class="w3-input w3-sand w3-border" value="parte principale">
+
+                        <div class="w3-panel w3-responsive">
+                            <table class="w3-table w3-centered">
+                                <tr>
+                                    <th></th>
+                                    <th>Ingrediente</th>
+                                    <th>principale?</th>
+                                </tr>
+                                <tr>
+                                    <td class="w3-padding-small">
+                                        <span class="w3-badge w3-large w3-amber main-button w3-hover-red">-</span>
+                                    </td>
+                                    <td class="w3-padding-small"><input type="text" class="w3-input w3-sand w3-border">
+                                    </td>
+                                    <td class="w3-padding-small"><input type="checkbox" class="w3-check"></td>
+                                </tr>
+                                <tr class="w3-auto">
+                                    <td class="w3-padding-small">
+                                        <span class="w3-badge w3-large w3-amber main-button w3-hover-red">+</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <p>
+                            <label>Descrizione procedimento</label>
+                            <textarea class="w3-input w3-sand w3-border"></textarea>
+                        </p>
+                        <button class="w3-button w3-block w3-round-large w3-amber w3-hover-red">Nuova variante</button>
+                    </fieldset>
+                    <button class="w3-button w3-block w3-round-large w3-margin-top w3-margin-bottom w3-amber w3-hover-red">Nuova parte</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>
