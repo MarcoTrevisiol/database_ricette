@@ -1,16 +1,7 @@
-/*img {
-    max-width:100%;
-    width:100%;
-}*/
-
 .main-button {
     cursor: pointer;
 }
 
 .main-container {
     max-width: 1400px;
-}
-
-textarea {
-    max-width: 100%;
 }
