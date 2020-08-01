@@ -2,3 +2,5 @@
 .*.swp
 .idea/
 git_untracked/
+__pycache__
+
