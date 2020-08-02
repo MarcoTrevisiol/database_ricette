@@ -28,6 +28,7 @@ function Controller() {
         'Niente': [],
     };
     this.nomiPeriodi = Object.keys(this.periodi);
+    this.categorie = '';
     
     this.SetMesi = function SetMesi(periodo) {
         console.log(periodo);
@@ -100,6 +101,22 @@ function Controller() {
             ],
             'procedura': '',
         });
+    };
+    
+    this.MandaRichiesta = function MandaRichiesta() {
+        var oggetto = {};
+        oggetto['titolo'] = this.titolo;
+        oggetto['portata'] = this.portata;
+        oggetto['tempo'] = moment.duration(this.tempo, 'minutes').toISOString();
+        oggetto['periodo'] = [];
+        for (m in this.mesi) {
+            if (this.mesiSelezionati[this.mesi[m]])
+                oggetto['periodo'].push(this.mesi[m]);
+        }
+        oggetto['categorie'] = this.categorie.split(/[,;.:]/).filter(value => value != '');
+        oggetto['parti'] = this.parti;
+        
+        console.log(oggetto);
     };
 }
 

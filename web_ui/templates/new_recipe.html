@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/main.css"/>
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.0/moment.min.js" type="text/javascript"></script>
     <script src="js/main.js"></script>
 </head>
 <body class="w3-auto w3-theme-light">
@@ -54,7 +55,7 @@
                 </div>
                 <p>
                     <label>Ulteriori categorie</label>
-                    <input type="text" class="w3-input w3-theme-light w3-border">
+                    <input type="text" class="w3-input w3-theme-light w3-border" ng-model="recipe.categorie">
                 </p>
                 <div>
                     <fieldset ng-repeat="p in recipe.parti">
@@ -96,7 +97,7 @@
                             <textarea class="w3-input w3-theme-light w3-border" cols="20" ng-model="p['procedura']"></textarea>
                         </p>
                         <fieldset ng-repeat="v in p['varianti']">
-                        <div class="w3-panel w3-responsive">
+                        <div class="w3-responsive">
                             <table class="w3-table w3-centered">
                                 <tr>
                                     <th><span class="w3-button w3-large w3-theme-d1 main-button w3-hover-yellow"
@@ -135,6 +136,8 @@
                     <button class="w3-button w3-block w3-round-large w3-margin-top w3-margin-bottom w3-theme-d1 w3-hover-yellow"
                     ng-click="recipe.AggiungiParte()">Nuova parte</button>
                 </div>
+                <button class="w3-button w3-block w3-round-large w3-theme-d1 w3-hover-yellow"
+                        ng-click="recipe.MandaRichiesta()">Registra ricetta</button>
             </form>
         </div>
     </div>

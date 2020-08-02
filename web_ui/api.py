@@ -3,7 +3,7 @@ import json
 import string
 import random
 
-template_location = "templates/"
+template_location = "answer_templates/"
 template_error = "{}error.html".format(template_location)
 
 
