@@ -1,4 +1,14 @@
-function Controller() {
+function PostRicettaFactory($http) {
+    var url = '/cgi-bin/main.py/nuova_ricetta';
+    return {
+        PostRicetta: function (ricetta) {
+            return $http.post(url, ricetta);
+        },
+    };
+};
+
+function Controller(PostRicettaFactory, $sce) {
+    var vm = this;
     this.titolo = "Titolo della ricetta";
     this.fotoPortate = {
         'Primo': 'images/Primo.jpg',
@@ -57,40 +67,40 @@ function Controller() {
             'procedura': '',
         },
     ];
-    this.TogliIngrediente = function TogliIngrediente(parte, ingrediente) {
+    this.TogliIngrediente = function (parte, ingrediente) {
         console.log(parte, ingrediente);
         var index = parte['ingredienti'].indexOf(ingrediente);
         if (index > -1) {
             parte['ingredienti'].splice(index, 1);
         }
     };
-    this.AggiungiIngrediente = function AggiungiIngrediente(parte) {
+    this.AggiungiIngrediente = function (parte) {
         console.log(parte);
         parte['ingredienti'].push({
             'nome': '',
             'principale': false,
         });
     };
-    this.TogliVariante = function TogliVariante(parte, variante) {
+    this.TogliVariante = function (parte, variante) {
         var index = parte['varianti'].indexOf(variante);
         if (index > -1) {
             parte['varianti'].splice(index, 1);
         }
     };
-    this.AggiungiVariante = function AggiungiVariante(parte) {
+    this.AggiungiVariante = function (parte) {
         parte['varianti'] = parte['varianti'] || [];
         parte['varianti'].push({
             'ingredienti': [],
             'procedura': '',
         });
     };
-    this.TogliParte = function TogliParte(parte) {
+    this.TogliParte = function (parte) {
         var index = this.parti.indexOf(parte);
         if (index > -1) {
             this.parti.splice(index, 1);
         }
     };
-    this.AggiungiParte = function AggiungiParte() {
+    this.AggiungiParte = function () {
         this.parti.push({
             'nome': 'parte secondaria',
             'ingredienti': [
@@ -117,9 +127,17 @@ function Controller() {
         oggetto['parti'] = this.parti;
         
         console.log(oggetto);
+        PostRicettaFactory.PostRicetta(oggetto)
+            .then(function(response) {
+                vm.posto = {
+                    status: response.status,
+                    data: $sce.trustAsHtml(response.data),
+                }
+            });
     };
 }
 
 angular
     .module('recipes', [])
-    .controller('Controller', Controller);
+    .controller('Controller', ['PostRicettaFactory', '$sce', Controller])
+    .factory('PostRicettaFactory', ['$http', PostRicettaFactory]);

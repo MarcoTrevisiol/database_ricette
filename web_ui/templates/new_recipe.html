@@ -139,6 +139,8 @@
                 <button class="w3-button w3-block w3-round-large w3-theme-d1 w3-hover-yellow"
                         ng-click="recipe.MandaRichiesta()">Registra ricetta</button>
             </form>
+            <p>{{recipe.posto.status}}</p>
+            <div ng-bind-html="recipe.posto.data"></div>
         </div>
     </div>
 </div>
