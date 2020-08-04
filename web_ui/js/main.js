@@ -1,134 +1,128 @@
-function PostRicettaFactory($http) {
-    var url = '/cgi-bin/main.py/nuova_ricetta';
+function ModelliFactory() {
+    var modelli = {
+        'ingrediente': function () {
+            this.nome = '';
+            this.principale = false;
+        },
+        'variante': function () {
+            this.ingredienti = [];
+            this.procedura = '';
+        }
+    };
+    modelli['parte'] = function () {
+        this.nome = 'parte secondaria';
+        this.ingredienti = [new modelli['ingrediente']()];
+        this.procedura = '';
+        this.varianti = [];
+    };
+    modelli['partePrincipale'] = function () {
+        this.nome = 'parte principale';
+        this.ingredienti = [
+            new modelli['ingrediente'](),
+            {
+                'nome': '',
+                'principale': true,
+            },
+        ];
+        this.procedura = '';
+        this.varianti = [];
+    };
     return {
-        PostRicetta: function (ricetta) {
-            return $http.post(url, ricetta);
+        Modello: function (modello) {
+            return new modelli[modello]();
         },
     };
 };
 
-function Controller(PostRicettaFactory, $sce) {
-    var vm = this;
-    this.titolo = "Titolo della ricetta";
-    this.fotoPortate = {
-        'Primo': 'images/Primo.jpg',
-        'Secondo': 'images/Secondo.jpg',
-        'Contorno': 'images/Contorno.jpg',
-        'Dolce': 'images/Dolce.jpg',
-    };
-    this.portate = Object.keys(this.fotoPortate);
-    this.portata = this.portate[0];
-    console.log(this.portata);
-    
-    this.tempo = 30;
-    this.mesi = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
-    
-    this.mesiSelezionati = {}
-    for (m in this.mesi) {
-        this.mesiSelezionati[this.mesi[m]] = true;
-    }
-    console.log(this.mesiSelezionati);
-    
-    this.periodi = {
-        'Primavera': ['mar', 'apr', 'mag'],
-        'Estate': ['giu', 'lug', 'ago'],
-        'Autunno': ['set', 'ott', 'nov'],
-        'Inverno': ['dic', 'gen', 'feb'],
-        'Tutti': this.mesi,
-        'Niente': [],
-    };
-    this.nomiPeriodi = Object.keys(this.periodi);
-    this.categorie = '';
-    
-    this.SetMesi = function SetMesi(periodo) {
-        console.log(periodo);
-        if (! (periodo in this.periodi))
-            periodo = 'Tutti';
-        for (m in this.mesi) {
-            var daAggiungere = this.periodi[periodo].includes(this.mesi[m]);
-            console.log(this.mesi[m], daAggiungere);
-            this.mesiSelezionati[this.mesi[m]] = daAggiungere;
-        }
-    };
-    
-    this.parti = [
-        {
-            'nome': 'parte principale',
-            'ingredienti': [
-                {
-                    'nome': '',
-                    'principale': false,
-                },
-                {
-                    'nome': '',
-                    'principale': true,
-                },
-            ],
-            'procedura': '',
+function ApiRicetteFactory($http) {
+    var url_nuova_ricetta = '/cgi-bin/main.py/nuova_ricetta';
+    return {
+        PostRicetta: function (ricetta) {
+            return $http.post(url_nuova_ricetta, ricetta);
         },
-    ];
-    this.TogliIngrediente = function (parte, ingrediente) {
-        console.log(parte, ingrediente);
-        var index = parte['ingredienti'].indexOf(ingrediente);
-        if (index > -1) {
-            parte['ingredienti'].splice(index, 1);
+        GetPortate: function () {
+            return {
+                'Primo': 'images/Primo.jpg',
+                'Secondo': 'images/Secondo.jpg',
+                'Contorno': 'images/Contorno.jpg',
+                'Dolce': 'images/Dolce.jpg',
+            };
+        },
+        GetPeriodi: function () {
+            return {
+                'Primavera': ['mar', 'apr', 'mag'],
+                'Estate': ['giu', 'lug', 'ago'],
+                'Autunno': ['set', 'ott', 'nov'],
+                'Inverno': ['dic', 'gen', 'feb'],
+                'Tutti': ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'],
+                'Niente': [],
+            };
+        },
+    };
+};
+
+function TimeFilterISO() {
+    return function (numeroMinuti) {
+        return moment.duration(numeroMinuti, 'minutes').toISOString();
+    };
+};
+
+function Controller(ModelliFactory, ApiRicetteFactory, $filter, $sce, $log) {
+    var vm = this;
+    vm.ricetta = {};
+    vm.ricetta.titolo = "Titolo della ricetta";
+    vm.fotoPortate = ApiRicetteFactory.GetPortate();
+    vm.portate = Object.keys(vm.fotoPortate);
+    vm.ricetta.portata = vm.portate[0];
+    
+    vm.tempo = 30;
+    
+    vm.periodi = ApiRicetteFactory.GetPeriodi();
+    vm.nomiPeriodi = Object.keys(vm.periodi);
+    vm.categorie = '';
+    vm.mesi = vm.periodi['Tutti'];
+    
+    vm.mesiSelezionati = {}
+    for (m in vm.mesi) {
+        vm.mesiSelezionati[vm.mesi[m]] = true;
+    }
+    $log.log(vm.mesiSelezionati);
+    
+    vm.SetMesi = function (periodo) {
+        $log.log(periodo);
+        if ( !(periodo in vm.periodi) )
+            periodo = 'Tutti';
+        for (m in vm.mesi) {
+            var daAggiungere = vm.periodi[periodo].includes(vm.mesi[m]);
+            $log.log(vm.mesi[m], daAggiungere);
+            vm.mesiSelezionati[vm.mesi[m]] = daAggiungere;
         }
-    };
-    this.AggiungiIngrediente = function (parte) {
-        console.log(parte);
-        parte['ingredienti'].push({
-            'nome': '',
-            'principale': false,
-        });
-    };
-    this.TogliVariante = function (parte, variante) {
-        var index = parte['varianti'].indexOf(variante);
-        if (index > -1) {
-            parte['varianti'].splice(index, 1);
-        }
-    };
-    this.AggiungiVariante = function (parte) {
-        parte['varianti'] = parte['varianti'] || [];
-        parte['varianti'].push({
-            'ingredienti': [],
-            'procedura': '',
-        });
-    };
-    this.TogliParte = function (parte) {
-        var index = this.parti.indexOf(parte);
-        if (index > -1) {
-            this.parti.splice(index, 1);
-        }
-    };
-    this.AggiungiParte = function () {
-        this.parti.push({
-            'nome': 'parte secondaria',
-            'ingredienti': [
-                {
-                    'nome': '',
-                    'principale': false,
-                }
-            ],
-            'procedura': '',
-        });
     };
     
-    this.MandaRichiesta = function MandaRichiesta() {
-        var oggetto = {};
-        oggetto['titolo'] = this.titolo;
-        oggetto['portata'] = this.portata;
-        oggetto['tempo'] = moment.duration(this.tempo, 'minutes').toISOString();
-        oggetto['periodo'] = [];
-        for (m in this.mesi) {
-            if (this.mesiSelezionati[this.mesi[m]])
-                oggetto['periodo'].push(this.mesi[m]);
+    vm.ricetta.parti = [ModelliFactory.Modello('partePrincipale')];
+    
+    vm.Togli = function (contenitore, ingrediente) {
+        var index = contenitore.indexOf(ingrediente);
+        if (index > -1) {
+            contenitore.splice(index, 1);
         }
-        oggetto['categorie'] = this.categorie.split(/[,;.:]/).filter(value => value != '');
-        oggetto['parti'] = this.parti;
+    };
+    vm.Aggiungi = function (contenitore, modello) {
+        contenitore.push(ModelliFactory.Modello(modello));
+    };
+
+    vm.MandaRichiesta = function () {
+        vm.ricetta['tempo'] = $filter('TimeFilterISO')(vm.tempo);
+        vm.ricetta['periodo'] = [];
+        for (m in vm.mesi) {
+            if (vm.mesiSelezionati[vm.mesi[m]])
+                vm.ricetta['periodo'].push(vm.mesi[m]);
+        }
+        vm.ricetta['categorie'] = vm.categorie.split(/[,;.:]/).filter(value => value != '');
         
-        console.log(oggetto);
-        PostRicettaFactory.PostRicetta(oggetto)
-            .then(function(response) {
+        $log.log(vm.ricetta);
+        ApiRicetteFactory.PostRicetta(vm.ricetta)
+            .then(function (response) {
                 vm.posto = {
                     status: response.status,
                     data: $sce.trustAsHtml(response.data),
@@ -139,5 +133,7 @@ function Controller(PostRicettaFactory, $sce) {
 
 angular
     .module('recipes', [])
-    .controller('Controller', ['PostRicettaFactory', '$sce', Controller])
-    .factory('PostRicettaFactory', ['$http', PostRicettaFactory]);
+    .factory('ModelliFactory', ModelliFactory)
+    .factory('ApiRicetteFactory', ['$http', ApiRicetteFactory])
+    .filter('TimeFilterISO', TimeFilterISO)
+    .controller('Controller', ['ModelliFactory', 'ApiRicetteFactory', '$filter', '$sce', '$log', Controller]);

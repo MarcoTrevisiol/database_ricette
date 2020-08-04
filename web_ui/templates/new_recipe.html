@@ -16,24 +16,27 @@
 <body class="w3-auto w3-theme-light">
 <div class="w3-card w3-margin main-container" ng-app="recipes" ng-controller="Controller as recipe">
     <div class="w3-row">
-        <div class="w3-third w3-brown"><img class="w3-image w3-block" ng-src="{{recipe.fotoPortate[recipe.portata]}}"></div>
+        <div class="w3-third w3-brown">
+            <img class="w3-image w3-block" ng-src="{{recipe.fotoPortate[recipe.ricetta.portata]}}">
+        </div>
         <div class="w3-rest w3-container w3-theme-l1">
             <h1 class="w3-container">Nuova ricetta</h1>
             <form class="w3-container">
                 <p>
                     <label>Titolo ricetta</label>
-                    <input type="text" class="w3-input w3-theme-light w3-border" ng-model="recipe.titolo">
+                    <input type="text" class="w3-input w3-theme-light w3-border" ng-model="recipe.ricetta.titolo">
                 </p>
                 <div class="w3-row">
                     <div class="w3-col w3-half">
                         <label>Tipo di portata</label>
-                        <select class="w3-select w3-border w3-theme-light" ng-model="recipe.portata">
+                        <select class="w3-select w3-border w3-theme-light" ng-model="recipe.ricetta.portata">
                             <option value="{{c}}" ng-repeat="c in recipe.portate" ng-selected="$first">{{c}}</option>
                         </select>
                     </div>
                     <div class="w3-col w3-half">
                         <label>Tempo di preparazione</label>
-                        <input type="number" class="w3-input w3-theme-light w3-border" ng-model="recipe.tempo" min="0" step="5">
+                        <input type="number" class="w3-input w3-theme-light w3-border" ng-model="recipe.tempo"
+                               min="0" step="5">
                     </div>
                 </div>
                 <div>
@@ -58,12 +61,12 @@
                     <input type="text" class="w3-input w3-theme-light w3-border" ng-model="recipe.categorie">
                 </p>
                 <div>
-                    <fieldset ng-repeat="p in recipe.parti">
+                    <fieldset ng-repeat="p in recipe.ricetta.parti">
                         <legend>{{p['nome']}}</legend>
                         <div class="w3-row">
                             <input type="text" class="w3-input w3-theme-light w3-border w3-col m11" ng-model="p['nome']">
                             <button class="w3-button w3-large w3-theme-d1 main-button w3-hover-yellow w3-col m1"
-                            ng-click="recipe.TogliParte(p)">X</button>
+                            ng-click="recipe.Togli(recipe.ricetta.parti, p)">X</button>
                         </div>
                         <div class="w3-responsive">
                             <table class="w3-table w3-centered">
@@ -75,7 +78,7 @@
                                 <tr ng-repeat="i in p['ingredienti']">
                                     <td class="w3-padding-small">
                                         <span class="w3-badge w3-large w3-theme-d1 main-button w3-hover-yellow"
-                                        ng-click="recipe.Togli(p, i)">-</span>
+                                        ng-click="recipe.Togli(p['ingredienti'], i)">-</span>
                                     </td>
                                     <td class="w3-padding-small">
                                         <input type="text" class="w3-input w3-theme-light w3-border" ng-model="i['nome']">
@@ -87,7 +90,7 @@
                                 <tr class="w3-auto">
                                     <td class="w3-padding-small">
                                         <span class="w3-badge w3-large w3-theme-d1 main-button w3-hover-yellow"
-                                        ng-click="recipe.Aggiungi(p)">+</span>
+                                        ng-click="recipe.Aggiungi(p['ingredienti'], 'ingrediente')">+</span>
                                     </td>
                                 </tr>
                             </table>
@@ -101,14 +104,14 @@
                             <table class="w3-table w3-centered">
                                 <tr>
                                     <th><span class="w3-button w3-large w3-theme-d1 main-button w3-hover-yellow"
-                                        ng-click="recipe.TogliVariante(p, v)">x</span></th>
+                                        ng-click="recipe.Togli(p['varianti'], v)">x</span></th>
                                     <th>Ingrediente</th>
                                     <th>principale?</th>
                                 </tr>
                                 <tr ng-repeat="i in v['ingredienti']">
                                     <td class="w3-padding-small">
                                         <span class="w3-badge w3-large w3-theme-d1 main-button w3-hover-yellow"
-                                        ng-click="recipe.TogliIngrediente(v, i)">-</span>
+                                        ng-click="recipe.Togli(v['ingredienti'], i)">-</span>
                                     </td>
                                     <td class="w3-padding-small">
                                         <input type="text" class="w3-input w3-theme-light w3-border" ng-model="i['nome']">
@@ -120,7 +123,7 @@
                                 <tr class="w3-auto">
                                     <td class="w3-padding-small">
                                         <span class="w3-badge w3-large w3-theme-d1 main-button w3-hover-yellow"
-                                        ng-click="recipe.AggiungiIngrediente(v)">+</span>
+                                        ng-click="recipe.Aggiungi(v['ingredienti'], 'ingrediente')">+</span>
                                     </td>
                                 </tr>
                             </table>
@@ -131,15 +134,14 @@
                         </p>
                         </fieldset>
                         <button class="w3-button w3-block w3-round-large w3-theme-d1 w3-hover-yellow"
-                        ng-click="recipe.AggiungiVariante(p)">Nuova variante</button>
+                        ng-click="recipe.Aggiungi(p['varianti'], 'variante')">Nuova variante</button>
                     </fieldset>
                     <button class="w3-button w3-block w3-round-large w3-margin-top w3-margin-bottom w3-theme-d1 w3-hover-yellow"
-                    ng-click="recipe.AggiungiParte()">Nuova parte</button>
+                    ng-click="recipe.Aggiungi(recipe.ricetta.parti, 'parte')">Nuova parte</button>
                 </div>
                 <button class="w3-button w3-block w3-round-large w3-theme-d1 w3-hover-yellow"
                         ng-click="recipe.MandaRichiesta()">Registra ricetta</button>
             </form>
-            <p>{{recipe.posto.status}}</p>
             <div ng-bind-html="recipe.posto.data"></div>
         </div>
     </div>
