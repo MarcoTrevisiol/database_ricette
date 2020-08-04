@@ -61,13 +61,7 @@ function ApiRicetteFactory($http) {
     };
 };
 
-function TimeFilterISO() {
-    return function (numeroMinuti) {
-        return moment.duration(numeroMinuti, 'minutes').toISOString();
-    };
-};
-
-function Controller(ModelliFactory, ApiRicetteFactory, $filter, $sce, $log) {
+function Controller(ModelliFactory, ApiRicetteFactory, $sce, $log) {
     var vm = this;
     vm.ricetta = {};
     vm.ricetta.titolo = "Titolo della ricetta";
@@ -75,7 +69,7 @@ function Controller(ModelliFactory, ApiRicetteFactory, $filter, $sce, $log) {
     vm.portate = Object.keys(vm.fotoPortate);
     vm.ricetta.portata = vm.portate[0];
     
-    vm.tempo = 30;
+    vm.ricetta.tempo = 'PT30M';
     
     vm.periodi = ApiRicetteFactory.GetPeriodi();
     vm.nomiPeriodi = Object.keys(vm.periodi);
@@ -112,7 +106,6 @@ function Controller(ModelliFactory, ApiRicetteFactory, $filter, $sce, $log) {
     };
 
     vm.MandaRichiesta = function () {
-        vm.ricetta['tempo'] = $filter('TimeFilterISO')(vm.tempo);
         vm.ricetta['periodo'] = [];
         for (m in vm.mesi) {
             if (vm.mesiSelezionati[vm.mesi[m]])
@@ -129,11 +122,29 @@ function Controller(ModelliFactory, ApiRicetteFactory, $filter, $sce, $log) {
                 }
             });
     };
-}
+};
+
+function RecDurationDirective() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attr, ngModel) {
+            function fromUser(minuti) {
+                return moment.duration(minuti, 'minutes').toISOString();
+            }
+
+            function toUser(isoString) {
+                return moment.duration(isoString).asMinutes();
+            }
+            ngModel.$parsers.push(fromUser);
+            ngModel.$formatters.push(toUser);
+        },
+    };
+};
 
 angular
     .module('recipes', [])
     .factory('ModelliFactory', ModelliFactory)
     .factory('ApiRicetteFactory', ['$http', ApiRicetteFactory])
-    .filter('TimeFilterISO', TimeFilterISO)
-    .controller('Controller', ['ModelliFactory', 'ApiRicetteFactory', '$filter', '$sce', '$log', Controller]);
+    .directive('recDuration', RecDurationDirective)
+    .controller('Controller', ['ModelliFactory', 'ApiRicetteFactory', '$sce', '$log', Controller]);
