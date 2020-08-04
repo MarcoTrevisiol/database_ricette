@@ -128,7 +128,7 @@ function RecDurationDirective() {
     return {
         restrict: 'A',
         require: 'ngModel',
-        link: function(scope, element, attr, ngModel) {
+        link: function(scope, element, attr, ngModelCtrl) {
             function fromUser(minuti) {
                 return moment.duration(minuti, 'minutes').toISOString();
             }
@@ -136,9 +136,30 @@ function RecDurationDirective() {
             function toUser(isoString) {
                 return moment.duration(isoString).asMinutes();
             }
-            ngModel.$parsers.push(fromUser);
-            ngModel.$formatters.push(toUser);
+            ngModelCtrl.$parsers.push(fromUser);
+            ngModelCtrl.$formatters.push(toUser);
         },
+    };
+};
+
+
+function contenteditable() {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attr, ngModelCtrl) {
+            // view -> model
+            element.on('blur', function() {
+                ngModelCtrl.$setViewValue(element.html());
+            });
+
+            // model -> view
+            ngModelCtrl.$render = function() {
+                element.html(ngModelCtrl.$viewValue);
+            };
+
+            // load init value from DOM
+            ngModelCtrl.$render;
+        }
     };
 };
 
@@ -147,4 +168,5 @@ angular
     .factory('ModelliFactory', ModelliFactory)
     .factory('ApiRicetteFactory', ['$http', ApiRicetteFactory])
     .directive('recDuration', RecDurationDirective)
+    .directive('contenteditable', contenteditable)
     .controller('Controller', ['ModelliFactory', 'ApiRicetteFactory', '$sce', '$log', Controller]);
