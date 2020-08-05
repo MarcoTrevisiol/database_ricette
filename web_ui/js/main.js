@@ -63,10 +63,31 @@ function ApiRicetteFactory($http) {
     };
 };
 
-function Controller(ModelliFactory, ApiRicetteFactory, $sce, $log) {
+function NormalizzaDosiFactory() {
+    return {
+        Normalizza: function (ricetta, dosi) {
+            for (p in ricetta.parti) {
+                parte = ricetta.parti[p];
+                for (i in parte.ingredienti) {
+                    ingrediente = parte.ingredienti[i];
+                    ingrediente.quantita.valore /= dosi;
+                }
+                for (v in parte.varianti) {
+                    for (i in parte.varianti[v]) {
+                        ingrediente = parte.ingredienti[i];
+                        ingrediente.quantita.valore /= dosi;
+                    }
+                }
+            }
+        },
+    };
+};
+
+function Controller(ModelliFactory, ApiRicetteFactory, NormalizzaDosiFactory, $sce, $log) {
     var vm = this;
     vm.ricetta = {};
     vm.ricetta.titolo = "Titolo della ricetta";
+    vm.dosi = 4;
     vm.fotoPortate = ApiRicetteFactory.GetPortate();
     vm.portate = Object.keys(vm.fotoPortate);
     vm.ricetta.portata = vm.portate[0];
@@ -126,7 +147,7 @@ function Controller(ModelliFactory, ApiRicetteFactory, $sce, $log) {
     vm.EUltimo = function (contenitore, oggetto) {
         return contenitore.indexOf(oggetto) == contenitore.length-1;
     };
-
+    
     vm.MandaRichiesta = function () {
         vm.ricetta['periodo'] = [];
         for (m in vm.mesi) {
@@ -135,9 +156,11 @@ function Controller(ModelliFactory, ApiRicetteFactory, $sce, $log) {
         }
         vm.ricetta['categorie'] = vm.categorie.split(/[,;.:]/).filter(value => value != '');
         
+        NormalizzaDosiFactory.Normalizza(vm.ricetta, vm.dosi);
         $log.log(vm.ricetta);
         ApiRicetteFactory.PostRicetta(vm.ricetta)
             .then(function (response) {
+                NormalizzaDosiFactory.Normalizza(vm.ricetta, 1/vm.dosi);
                 vm.posto = {
                     status: response.status,
                     data: $sce.trustAsHtml(response.data),
@@ -180,7 +203,7 @@ function contenteditable() {
             };
 
             // load init value from Model
-            ngModelCtrl.$render;
+            ngModelCtrl.$render();
         }
     };
 };
@@ -191,11 +214,11 @@ function RecQuantitaDirective() {
         require: 'ngModel',
         link: function(scope, element, attr, ngModelCtrl) {
             function fromUser(quanto) {
-                number = quanto.match(/^[0-9]*/)[0];
+                number = quanto.match(/^[0-9]*(.[0-9]*)?/)[0];
                 unitRegex = number + "\(.*\)$";
                 unit = quanto.match(unitRegex)[1];
                 if (number.length > 0)
-                    amount = parseInt(number);
+                    amount = parseFloat(number);
                 else
                     amount = 1;
                 return {
@@ -218,7 +241,8 @@ angular
     .module('recipes', [])
     .factory('ModelliFactory', ModelliFactory)
     .factory('ApiRicetteFactory', ['$http', ApiRicetteFactory])
+    .factory('NormalizzaDosiFactory', NormalizzaDosiFactory)
     .directive('recDuration', RecDurationDirective)
     .directive('contenteditable', contenteditable)
     .directive('recQuantita', RecQuantitaDirective)
-    .controller('Controller', ['ModelliFactory', 'ApiRicetteFactory', '$sce', '$log', Controller]);
+    .controller('Controller', ['ModelliFactory', 'ApiRicetteFactory', 'NormalizzaDosiFactory', '$sce', '$log', Controller]);
