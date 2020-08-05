@@ -19,3 +19,10 @@
 h1, label {
     font-weight: bold;
 }
+
+fieldset {
+    border-top: 4px solid;
+    border-left: 4px solid;
+    border-bottom: none;
+    border-right: none;
+}

@@ -1,9 +1,9 @@
 function ModelliFactory() {
     var modelli = {
         'ingrediente': function () {
-            this.nome = 'a';
+            this.nome = '';
             this.principale = false;
-            this.quantita = {'valore': 1, 'unita': ' u'};
+            this.quantita = {'valore': '', 'unita': ''};
         },
         'variante': function () {
             this.ingredienti = [];
@@ -20,11 +20,6 @@ function ModelliFactory() {
         this.nome = 'parte principale';
         this.ingredienti = [
             new modelli['ingrediente'](),
-            {
-                'nome': 'b',
-                'principale': true,
-                'quantita': {'valore': 1, 'unita': ' u'},
-            },
         ];
         this.procedura = '';
         this.varianti = [];

@@ -69,7 +69,7 @@
                     <input type="text" class="w3-input w3-theme-light w3-border" ng-model="recipe.categorie">
                 </p>
                 <div>
-                    <fieldset ng-repeat="p in recipe.ricetta.parti">
+                    <fieldset ng-repeat="p in recipe.ricetta.parti" class="w3-border-theme">
                         <legend contenteditable="true" ng-model="p['nome']"
                                 class="w3-theme-light w3-padding-small w3-border"></legend>
                         <div class="w3-row">
@@ -145,7 +145,7 @@
                             <textarea class="w3-input w3-theme-light w3-border" cols="20"
                                       ng-model="p['procedura']"></textarea>
                         </p>
-                        <fieldset ng-repeat="v in p['varianti']" class="w3-margin-bottom">
+                        <fieldset ng-repeat="v in p['varianti']" class="w3-margin-bottom w3-border-theme">
                             <div class="w3-responsive">
                                 <table class="w3-table w3-centered">
                                     <tr>
@@ -231,7 +231,7 @@
                          ng-class="{'w3-pale-red': recipe.posto.codice == 'errore',
                                     'w3-pale-green': recipe.posto.codice == 'ok'}">
                         <span class="w3-xxlarge">{{recipe.posto.codice}}</span>
-                        <pre class="w3-margin-left w3-show-inline-block">{{recipe.posto.messaggio}}</pre>
+                        <span class="w3-margin-left">{{recipe.posto.messaggio}}</span>
                     </div>
                     <button class="w3-button w3-block w3-round-large w3-theme-d1 w3-hover-yellow"
                             ng-click="recipe.MandaRichiesta()">Registra ricetta
