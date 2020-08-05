@@ -1,7 +1,21 @@
 .main-clickable {
     cursor: pointer;
+    min-height: 100%;
 }
 
 .main-container {
     max-width: 1400px;
+}
+
+.main-minpadding {
+    padding: 1px !important;
+}
+
+.main-invisible-border {
+    border: 1px solid;
+    border-color: #12e3ff;
+}
+
+h1, label {
+    font-weight: bold;
 }

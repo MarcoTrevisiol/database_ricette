@@ -1,8 +1,9 @@
 function ModelliFactory() {
     var modelli = {
         'ingrediente': function () {
-            this.nome = '';
+            this.nome = 'a';
             this.principale = false;
+            this.quantita = {'valore': 1, 'unita': ' u'};
         },
         'variante': function () {
             this.ingredienti = [];
@@ -20,8 +21,9 @@ function ModelliFactory() {
         this.ingredienti = [
             new modelli['ingrediente'](),
             {
-                'nome': '',
+                'nome': 'b',
                 'principale': true,
+                'quantita': {'valore': 1, 'unita': ' u'},
             },
         ];
         this.procedura = '';
@@ -95,14 +97,34 @@ function Controller(ModelliFactory, ApiRicetteFactory, $sce, $log) {
     
     vm.ricetta.parti = [ModelliFactory.Modello('partePrincipale')];
     
-    vm.Togli = function (contenitore, ingrediente) {
-        var index = contenitore.indexOf(ingrediente);
+    vm.Togli = function (contenitore, oggetto) {
+        var index = contenitore.indexOf(oggetto);
         if (index > -1) {
             contenitore.splice(index, 1);
         }
     };
     vm.Aggiungi = function (contenitore, modello) {
         contenitore.push(ModelliFactory.Modello(modello));
+    };
+    
+    vm.Muovi = function (contenitore, oggetto, direzione) {
+        var index = contenitore.indexOf(oggetto);
+        if (index > -1) {
+            $log.log(contenitore, oggetto, direzione, index);
+            if (index == 0 && direzione == -1)
+                return;
+            if (index == contenitore.length-1 && direzione == 1)
+                return;
+            contenitore.splice(index, 1);
+            contenitore.splice(index + direzione, 0, oggetto);
+        }
+    };
+    
+    vm.EPrimo = function (contenitore, oggetto) {
+        return contenitore.indexOf(oggetto) == 0;
+    };
+    vm.EUltimo = function (contenitore, oggetto) {
+        return contenitore.indexOf(oggetto) == contenitore.length-1;
     };
 
     vm.MandaRichiesta = function () {
@@ -157,11 +179,40 @@ function contenteditable() {
                 element.html(ngModelCtrl.$viewValue);
             };
 
-            // load init value from DOM
+            // load init value from Model
             ngModelCtrl.$render;
         }
     };
 };
+
+function RecQuantitaDirective() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attr, ngModelCtrl) {
+            function fromUser(quanto) {
+                number = quanto.match(/^[0-9]*/)[0];
+                unitRegex = number + "\(.*\)$";
+                unit = quanto.match(unitRegex)[1];
+                if (number.length > 0)
+                    amount = parseInt(number);
+                else
+                    amount = 1;
+                return {
+                    valore: amount,
+                    unita: unit,
+                };
+            }
+
+            function toUser(quanto) {
+                return quanto.valore.toString() + quanto.unita;
+            }
+            ngModelCtrl.$parsers.push(fromUser);
+            ngModelCtrl.$formatters.push(toUser);
+        },
+    };
+};
+
 
 angular
     .module('recipes', [])
@@ -169,4 +220,5 @@ angular
     .factory('ApiRicetteFactory', ['$http', ApiRicetteFactory])
     .directive('recDuration', RecDurationDirective)
     .directive('contenteditable', contenteditable)
+    .directive('recQuantita', RecQuantitaDirective)
     .controller('Controller', ['ModelliFactory', 'ApiRicetteFactory', '$sce', '$log', Controller]);
