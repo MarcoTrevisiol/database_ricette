@@ -83,7 +83,7 @@ function NormalizzaDosiFactory() {
     };
 };
 
-function Controller(ModelliFactory, ApiRicetteFactory, NormalizzaDosiFactory, $sce, $log) {
+function Controller(ModelliFactory, ApiRicetteFactory, NormalizzaDosiFactory, $timeout, $log) {
     var vm = this;
     vm.ricetta = {};
     vm.ricetta.titolo = "Titolo della ricetta";
@@ -163,8 +163,10 @@ function Controller(ModelliFactory, ApiRicetteFactory, NormalizzaDosiFactory, $s
                 NormalizzaDosiFactory.Normalizza(vm.ricetta, 1/vm.dosi);
                 vm.posto = {
                     status: response.status,
-                    data: $sce.trustAsHtml(response.data),
+                    codice: response.data.codice,
+                    messaggio: response.data.messaggio,
                 }
+                $timeout(function () { vm.posto.status = 0; }, 10000);
             });
     };
 };
@@ -245,4 +247,4 @@ angular
     .directive('recDuration', RecDurationDirective)
     .directive('contenteditable', contenteditable)
     .directive('recQuantita', RecQuantitaDirective)
-    .controller('Controller', ['ModelliFactory', 'ApiRicetteFactory', 'NormalizzaDosiFactory', '$sce', '$log', Controller]);
+    .controller('Controller', ['ModelliFactory', 'ApiRicetteFactory', 'NormalizzaDosiFactory', '$timeout', '$log', Controller]);

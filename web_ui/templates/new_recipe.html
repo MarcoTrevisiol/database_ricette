@@ -212,11 +212,18 @@
                             ng-click="recipe.Aggiungi(recipe.ricetta.parti, 'parte')">Nuova parte
                     </button>
                 </div>
-                <button class="w3-button w3-block w3-round-large w3-theme-d1 w3-hover-yellow"
-                        ng-click="recipe.MandaRichiesta()">Registra ricetta
-                </button>
+                <div class="w3-card-2 w3-round-large w3-margin-bottom">
+                    <div class="w3-container w3-round-large" ng-show="recipe.posto.status == 200"
+                         ng-class="{'w3-pale-red': recipe.posto.codice == 'errore',
+                                    'w3-pale-green': recipe.posto.codice == 'ok'}">
+                        <span class="w3-xxlarge">{{recipe.posto.codice}}</span>
+                        <pre class="w3-margin-left w3-show-inline-block">{{recipe.posto.messaggio}}</pre>
+                    </div>
+                    <button class="w3-button w3-block w3-round-large w3-theme-d1 w3-hover-yellow"
+                            ng-click="recipe.MandaRichiesta()">Registra ricetta
+                    </button>
+                </div>
             </form>
-            <div ng-bind-html="recipe.posto.data"></div>
         </div>
     </div>
 </div>

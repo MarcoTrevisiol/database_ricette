@@ -15,9 +15,11 @@ def ciao(*args, **kwargs):
 
 
 def errore(*args, **kwargs):
-    messaggio = kwargs.get('messaggio', "Siamo fregati!")
-    with open(template_error) as file:
-        return file.read().format(descrizione=messaggio)
+    risposta = {
+        'codice': 'errore',
+        'messaggio': kwargs.get('messaggio', "Siamo fregati!"),
+    }
+    return json.dumps(risposta)
 
 
 def nuova_ricetta(*args, **kwargs):
@@ -56,5 +58,8 @@ def nuova_ricetta(*args, **kwargs):
     with open(database_filename, 'w') as db_ricette:
         json.dump(elenco_ricette, db_ricette)
 
-    with open('{}ok.html'.format(template_location)) as html_file:
-        return html_file.read()
+    risposta = {
+        'codice': 'ok',
+        'messaggio': "Nuova ricetta registrata correttamente",
+    }
+    return json.dumps(risposta)
