@@ -85,7 +85,10 @@
                                     </th>
                                     <th>Ingrediente</th>
                                     <th>Quantità</th>
-                                    <th><span class="material-icons w3-xlarge" title="è principale?">star_border</span></th>
+                                    <th>
+                                        <span class="material-icons w3-xlarge" title="è principale?">star_border</span>
+                                    </th>
+                                    <th>Annotazioni</th>
                                 </tr>
                                 <tr ng-repeat="i in p['ingredienti']">
                                     <td class="main-minpadding">
@@ -121,6 +124,10 @@
                                     <td class="w3-padding-small">
                                         <input type="checkbox" class="w3-check" ng-model="i['principale']">
                                     </td>
+                                    <td class="w3-padding-small">
+                                        <input type="text" class="w3-input w3-theme-light w3-border"
+                                               ng-model="i['annotazioni']">
+                                    </td>
                                 </tr>
                                 <tr class="">
                                     <td class="main-minpadding" colspan="2">
@@ -150,7 +157,10 @@
                                         </th>
                                         <th>Ingrediente</th>
                                         <th>Quantità</th>
-                                        <th><span class="material-icons w3-xlarge">star_border</span></th>
+                                        <th>
+                                            <span class="material-icons w3-xlarge" title="è principale?">star_border</span>
+                                        </th>
+                                        <th>Annotazioni</th>
                                     </tr>
                                     <tr ng-repeat="i in v['ingredienti']">
                                         <td class="main-minpadding">
@@ -185,6 +195,10 @@
                                         </td>
                                         <td class="w3-padding-small">
                                             <input type="checkbox" class="w3-check" ng-model="i['principale']">
+                                        </td>
+                                        <td class="w3-padding-small">
+                                            <input type="text" class="w3-input w3-theme-light w3-border"
+                                                   ng-model="i['annotazioni']">
                                         </td>
                                     </tr>
                                     <tr class="">

@@ -73,8 +73,8 @@ function NormalizzaDosiFactory() {
                     ingrediente.quantita.valore /= dosi;
                 }
                 for (v in parte.varianti) {
-                    for (i in parte.varianti[v]) {
-                        ingrediente = parte.ingredienti[i];
+                    for (i in parte.varianti[v].ingredienti) {
+                        ingrediente = parte.varianti[v].ingredienti[i];
                         ingrediente.quantita.valore /= dosi;
                     }
                 }
