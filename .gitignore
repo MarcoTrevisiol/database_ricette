@@ -4,3 +4,5 @@
 git_untracked/
 __pycache__
 telegram_bot/token
+telegram_bot/*log
+telegram_bot/*pickle

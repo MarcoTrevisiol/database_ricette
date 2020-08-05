@@ -2,3 +2,8 @@
 name=RicettePersonali
 username=RicettePersonaliBot
 contacturl=http://t.me/RicettePersonaliBot
+
+[filenames]
+log=bot.log
+token=token
+persistence=persistence.pickle
