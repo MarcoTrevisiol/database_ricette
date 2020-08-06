@@ -4,7 +4,7 @@ import isodate
 import locale
 
 locale.setlocale(locale.LC_TIME, "it_IT.utf8")
-catalogo_file = 'catalogo_ricette.json'
+catalogo_file = '../catalogo_ricette.json'
 
 
 def query_globali(chiave='titolo'):
@@ -53,6 +53,9 @@ def query_ricette(**kwargs):
     def do_pass_filter(r):
         if 'portata' in kwargs.keys():
             if not kwargs['portata'] == r.get('portata'):
+                return False
+        if 'categoria' in kwargs.keys():
+            if not kwargs['categoria'] in r.get('categorie', []):
                 return False
         if 'titolo' in kwargs.keys():
             if not kwargs['titolo'].lower() in r.get('titolo').lower():
