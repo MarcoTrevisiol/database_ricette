@@ -3,9 +3,10 @@
 
     angular
         .module('recipes')
-        .controller('EditorController', ['RicettaFactory', 'ModelliFactory', 'ApiRicetteFactory', '$log', EditorController]);
+        .controller('EditorController', EditorController);
 
-
+    EditorController.$inject = ['RicettaFactory', 'ModelliFactory', 'ApiRicetteFactory', '$log'];
+        
     function EditorController(RicettaFactory, ModelliFactory, ApiRicetteFactory, $log) {
         var vm = this;
         vm.ricetta = RicettaFactory;

@@ -3,8 +3,9 @@
     
     angular
         .module('recipes')
-        .factory('ApiRicetteFactory', ['$http', ApiRicetteFactory])
+        .factory('ApiRicetteFactory', ApiRicetteFactory)
 
+    ApiRicetteFactory.$inject = ['$http'];
 
     function ApiRicetteFactory($http) {
         var url_nuova_ricetta = '/cgi-bin/main.py/nuova_ricetta';

@@ -3,8 +3,9 @@
     
     angular
         .module('recipes')
-        .config(['$routeProvider', configRoute]);
+        .config(configRoute);
     
+    configRoute.$inject = ['$routeProvider'];
     
     function configRoute($routeProvider) {
         $routeProvider

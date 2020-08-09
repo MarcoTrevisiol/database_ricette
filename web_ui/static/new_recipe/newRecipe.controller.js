@@ -3,8 +3,9 @@
     
     angular
         .module('recipes')
-        .controller('NewRecipeController', ['RicettaFactory', 'NormalizzaDosiFactory', 'ApiRicetteFactory', '$timeout', '$log', NewRecipeController]);
+        .controller('NewRecipeController', NewRecipeController);
 
+    NewRecipeController.$inject = ['RicettaFactory', 'NormalizzaDosiFactory', 'ApiRicetteFactory', '$timeout', '$log'];
 
     function NewRecipeController(RicettaFactory, NormalizzaDosiFactory, ApiRicetteFactory, $timeout, $log) {
         var vm = this;
