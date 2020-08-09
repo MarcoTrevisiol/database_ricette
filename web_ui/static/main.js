@@ -1,2 +1,7 @@
-angular
-    .module('recipes', ['ngRoute']);
+(function() {
+    'use strict';
+
+    angular
+        .module('recipes', ['ngRoute']);
+
+})();

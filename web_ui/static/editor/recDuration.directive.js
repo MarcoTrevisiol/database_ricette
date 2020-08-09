@@ -1,21 +1,26 @@
-angular
-    .module('recipes')
-    .directive('recDuration', RecDurationDirective)
+(function() {
+    'use strict';
 
-function RecDurationDirective() {
-    return {
-        restrict: 'A',
-        require: 'ngModel',
-        link: function(scope, element, attr, ngModelCtrl) {
-            function fromUser(minuti) {
-                return moment.duration(minuti, 'minutes').toISOString();
-            }
+    angular
+        .module('recipes')
+        .directive('recDuration', RecDurationDirective)
 
-            function toUser(isoString) {
-                return moment.duration(isoString).asMinutes();
-            }
-            ngModelCtrl.$parsers.push(fromUser);
-            ngModelCtrl.$formatters.push(toUser);
-        },
+        
+    function RecDurationDirective() {
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            link: function(scope, element, attr, ngModelCtrl) {
+                function fromUser(minuti) {
+                    return moment.duration(minuti, 'minutes').toISOString();
+                }
+
+                function toUser(isoString) {
+                    return moment.duration(isoString).asMinutes();
+                }
+                ngModelCtrl.$parsers.push(fromUser);
+                ngModelCtrl.$formatters.push(toUser);
+            },
+        };
     };
-};
+})();
