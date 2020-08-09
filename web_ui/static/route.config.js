@@ -4,10 +4,10 @@ angular
 
 function configRoute($routeProvider) {
     $routeProvider
-        .when('/editor', {
-            templateUrl: 'static/editor_ricetta.html',
-            controller: 'Controller',
-            controllerAs: 'recipe'
+        .when('/nuova_ricetta', {
+            templateUrl: 'static/new_recipe/new_recipe.html',
+            controller: 'NewRecipeController',
+            controllerAs: 'vm'
         })
-        .otherwise('/editor');
+        .otherwise('/nuova_ricetta');
 }

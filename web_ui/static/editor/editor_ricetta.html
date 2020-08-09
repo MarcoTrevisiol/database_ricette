@@ -1,6 +1,6 @@
 <div class="w3-row">
     <div class="w3-third w3-brown">
-        <img class="w3-image w3-block" ng-src="{{recipe.fotoPortate[recipe.ricetta.portata]}}">
+        <img class="w3-image w3-block" ng-src="{{editor.fotoPortate[editor.ricetta.portata]}}">
     </div>
     <div class="w3-rest w3-container">
         <h1 class="w3-container">Nuova ricetta</h1>
@@ -8,24 +8,24 @@
             <div class="w3-row w3-margin-top w3-margin-bottom">
                 <div class="w3-col w3-half">
                     <label>Titolo ricetta</label>
-                    <input type="text" class="w3-input w3-theme-light w3-border" ng-model="recipe.ricetta.titolo">
+                    <input type="text" class="w3-input w3-theme-light w3-border" ng-model="editor.ricetta.titolo">
                 </div>
                 <div class="w3-col w3-half">
                     <label>Dosi per quante persone</label>
-                    <input type="number" class="w3-input w3-theme-light w3-border" ng-model="recipe.dosi"
+                    <input type="number" class="w3-input w3-theme-light w3-border" ng-model="editor.ricetta.dosi"
                            min="0">
                 </div>
             </div>
             <div class="w3-row">
                 <div class="w3-col w3-half">
                     <label>Tipo di portata</label>
-                    <select class="w3-input w3-border w3-theme-light" ng-model="recipe.ricetta.portata">
-                        <option value="{{c}}" ng-repeat="c in recipe.portate" ng-selected="$first">{{c}}</option>
+                    <select class="w3-input w3-border w3-theme-light" ng-model="editor.ricetta.portata">
+                        <option value="{{c}}" ng-repeat="c in editor.portate" ng-selected="$first">{{c}}</option>
                     </select>
                 </div>
                 <div class="w3-col w3-half">
                     <label>Tempo di preparazione</label>
-                    <input type="number" class="w3-input w3-theme-light w3-border" ng-model="recipe.ricetta.tempo"
+                    <input type="number" class="w3-input w3-theme-light w3-border" ng-model="editor.ricetta.tempo"
                            min="0" step="5" rec-duration>
                 </div>
             </div>
@@ -34,24 +34,24 @@
                     <label>Stagionalità suggerita</label>
                 </span>
                 <div class="w3-row">
-                    <div class="w3-col l1 m1 s2 w3-center" ng-repeat="m in recipe.mesi">
-                        <input type="checkbox" class="w3-check" ng-model="recipe.mesiSelezionati[m]">
+                    <div class="w3-col l1 m1 s2 w3-center" ng-repeat="m in editor.mesi">
+                        <input type="checkbox" class="w3-check" ng-model="editor.mesiSelezionati[m]">
                         <label class="w3-block">{{m}}</label>
                     </div>
                 </div>
                 <div class="w3-row w3-bar">
                     <button class="w3-button w3-col l2 m2 s6 w3-center w3-round-large w3-padding-small w3-theme-d1 w3-hover-yellow main-invisible-border"
-                            ng-click="recipe.SetMesi(p)" ng-repeat="p in recipe.nomiPeriodi">
+                            ng-click="editor.SetMesi(p)" ng-repeat="p in editor.nomiPeriodi">
                         {{p}}
                     </button>
                 </div>
             </div>
             <p>
                 <label>Ulteriori categorie</label>
-                <input type="text" class="w3-input w3-theme-light w3-border" ng-model="recipe.categorie">
+                <input type="text" class="w3-input w3-theme-light w3-border" ng-model="editor.categorie">
             </p>
             <div>
-                <fieldset ng-repeat="p in recipe.ricetta.parti" class="w3-border-theme">
+                <fieldset ng-repeat="p in editor.ricetta.parti" class="w3-border-theme">
                     <legend contenteditable="true" ng-model="p['nome']"
                             class="w3-theme-light w3-padding-small w3-border"></legend>
                     <div class="w3-row">
@@ -61,7 +61,7 @@
                             <tr>
                                 <th class="main-minpadding" colspan="2">
                                     <span class="w3-block main-clickable main-invisible-border w3-theme-d1 w3-hover-yellow w3-round-large"
-                                          ng-click="recipe.Togli(recipe.ricetta.parti, p)" title="elimina questa parte">
+                                          ng-click="editor.Togli(editor.ricetta.parti, p)" title="elimina questa parte">
                                         <span class="material-icons">clear</span>
                                     </span>
                                 </th>
@@ -75,22 +75,22 @@
                             <tr ng-repeat="i in p['ingredienti']">
                                 <td class="main-minpadding">
                                     <span class="w3-block main-clickable main-invisible-border w3-theme-d1 w3-hover-yellow w3-round-large"
-                                          ng-click="recipe.Togli(p['ingredienti'], i)" title="elimina questo ingrediente">
+                                          ng-click="editor.Togli(p['ingredienti'], i)" title="elimina questo ingrediente">
                                         <span class="material-icons">remove</span>
                                     </span>
                                 </td>
                                 <td class="main-minpadding">
                                     <span class="w3-block main-invisible-border w3-theme-d1 w3-hover-yellow w3-round-large"
-                                          ng-click="recipe.Muovi(p['ingredienti'], i, -1)"
-                                          ng-class="{'w3-disabled' : recipe.EPrimo(p['ingredienti'], i),
-                                                     'main-clickable' : !recipe.EPrimo(p['ingredienti'], i)}"
+                                          ng-click="editor.Muovi(p['ingredienti'], i, -1)"
+                                          ng-class="{'w3-disabled' : editor.EPrimo(p['ingredienti'], i),
+                                                     'main-clickable' : !editor.EPrimo(p['ingredienti'], i)}"
                                           title="sposta ingrediente">
                                         <span class="material-icons">keyboard_arrow_up</span>
                                     </span>
                                     <span class="w3-block main-invisible-border w3-theme-d1 w3-hover-yellow w3-round-large"
-                                          ng-click="recipe.Muovi(p['ingredienti'], i, 1)"
-                                          ng-class="{'w3-disabled' : recipe.EUltimo(p['ingredienti'], i),
-                                                     'main-clickable' : !recipe.EUltimo(p['ingredienti'], i)}"
+                                          ng-click="editor.Muovi(p['ingredienti'], i, 1)"
+                                          ng-class="{'w3-disabled' : editor.EUltimo(p['ingredienti'], i),
+                                                     'main-clickable' : !editor.EUltimo(p['ingredienti'], i)}"
                                           title="sposta ingrediente">
                                         <span class="material-icons">keyboard_arrow_down</span>
                                     </span>
@@ -114,7 +114,7 @@
                             <tr class="">
                                 <td class="main-minpadding" colspan="2">
                                     <span class="w3-block main-clickable main-invisible-border w3-theme-d1 w3-hover-yellow w3-round-large"
-                                          ng-click="recipe.Aggiungi(p['ingredienti'], 'ingrediente')"
+                                          ng-click="editor.Aggiungi(p['ingredienti'], 'ingrediente')"
                                           title="aggiungi ingrediente">
                                         <span class="material-icons">add</span>
                                     </span>
@@ -133,7 +133,7 @@
                                 <tr>
                                     <th class="main-minpadding" colspan="2">
                                         <span class="w3-block main-clickable main-invisible-border w3-theme-d1 w3-hover-yellow w3-round-large"
-                                              ng-click="recipe.Togli(p['varianti'], v)" title="elimina questa variante">
+                                              ng-click="editor.Togli(p['varianti'], v)" title="elimina questa variante">
                                             <span class="material-icons">clear</span>
                                         </span>
                                     </th>
@@ -147,22 +147,22 @@
                                 <tr ng-repeat="i in v['ingredienti']">
                                     <td class="main-minpadding">
                                         <span class="w3-block main-clickable main-invisible-border w3-theme-d1 w3-hover-yellow w3-round-large"
-                                              ng-click="recipe.Togli(v['ingredienti'], i)" title="elimina questo ingrediente">
+                                              ng-click="editor.Togli(v['ingredienti'], i)" title="elimina questo ingrediente">
                                             <span class="material-icons">remove</span>
                                         </span>
                                     </td>
                                     <td class="main-minpadding">
                                         <span class="w3-block main-invisible-border w3-theme-d1 w3-hover-yellow w3-round-large"
-                                              ng-click="recipe.Muovi(v['ingredienti'], i, -1)"
-                                              ng-class="{'w3-disabled' : recipe.EPrimo(v['ingredienti'], i),
-                                                         'main-clickable' : !recipe.EPrimo(v['ingredienti'], i)}"
+                                              ng-click="editor.Muovi(v['ingredienti'], i, -1)"
+                                              ng-class="{'w3-disabled' : editor.EPrimo(v['ingredienti'], i),
+                                                         'main-clickable' : !editor.EPrimo(v['ingredienti'], i)}"
                                               title="sposta ingrediente">
                                             <span class="material-icons">keyboard_arrow_up</span>
                                         </span>
                                         <span class="w3-block main-invisible-border w3-theme-d1 w3-hover-yellow w3-round-large"
-                                              ng-click="recipe.Muovi(v['ingredienti'], i, 1)"
-                                              ng-class="{'w3-disabled' : recipe.EUltimo(v['ingredienti'], i),
-                                                         'main-clickable' : !recipe.EUltimo(v['ingredienti'], i)}"
+                                              ng-click="editor.Muovi(v['ingredienti'], i, 1)"
+                                              ng-class="{'w3-disabled' : editor.EUltimo(v['ingredienti'], i),
+                                                         'main-clickable' : !editor.EUltimo(v['ingredienti'], i)}"
                                               title="sposta ingrediente">
                                             <span class="material-icons">keyboard_arrow_down</span>
                                         </span>
@@ -186,7 +186,7 @@
                                 <tr class="">
                                     <td class="main-minpadding" colspan="2">
                                         <span class="w3-block main-clickable main-invisible-border w3-theme-d1 w3-hover-yellow w3-round-large"
-                                              ng-click="recipe.Aggiungi(v['ingredienti'], 'ingrediente')"
+                                              ng-click="editor.Aggiungi(v['ingredienti'], 'ingrediente')"
                                               title="aggiungi ingrediente">
                                             <span class="material-icons">add</span>
                                         </span>
@@ -201,22 +201,11 @@
                         </p>
                     </fieldset>
                     <button class="w3-button w3-block w3-round-large w3-theme-d1 w3-hover-yellow"
-                            ng-click="recipe.Aggiungi(p['varianti'], 'variante')">Nuova variante
+                            ng-click="editor.Aggiungi(p['varianti'], 'variante')">Nuova variante
                     </button>
                 </fieldset>
                 <button class="w3-button w3-block w3-round-large w3-margin-top w3-margin-bottom w3-theme-d1 w3-hover-yellow"
-                        ng-click="recipe.Aggiungi(recipe.ricetta.parti, 'parte')">Nuova parte
-                </button>
-            </div>
-            <div class="w3-card-2 w3-round-large w3-margin-bottom">
-                <div class="w3-container w3-round-large" ng-show="recipe.posto.status == 200"
-                     ng-class="{'w3-pale-red': recipe.posto.codice == 'errore',
-                                'w3-pale-green': recipe.posto.codice == 'ok'}">
-                    <span class="w3-xxlarge">{{recipe.posto.codice}}</span>
-                    <span class="w3-margin-left">{{recipe.posto.messaggio}}</span>
-                </div>
-                <button class="w3-button w3-block w3-round-large w3-theme-d1 w3-hover-yellow"
-                        ng-click="recipe.MandaRichiesta()">Registra ricetta
+                        ng-click="editor.Aggiungi(editor.ricetta.parti, 'parte')">Nuova parte
                 </button>
             </div>
         </form>

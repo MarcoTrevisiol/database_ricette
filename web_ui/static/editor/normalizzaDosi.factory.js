@@ -1,6 +1,6 @@
 angular
     .module('recipes')
-    .factory('NormalizzaDosiFactory', NormalizzaDosiFactory)
+    .factory('NormalizzaDosiFactory', NormalizzaDosiFactory);
 
 function NormalizzaDosiFactory() {
     return {

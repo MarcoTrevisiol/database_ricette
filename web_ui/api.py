@@ -40,6 +40,12 @@ def nuova_ricetta(*args, **kwargs):
     alphabet = string.ascii_lowercase + string.digits
     j_corpo['id'] = ''.join(random.choices(alphabet, k=8))
 
+    # tolgo il valore "dosi" portato dall'interfaccia angular
+    try:
+        del j_corpo['dosi']
+    except ValueError:
+        pass
+
     # salvo la nuova ricetta nel database
     database_filename = '../catalogo_ricette.json'
     with open(database_filename) as db_ricette:

@@ -2,8 +2,11 @@
 
 index="index.html"
 
-model="static/new_recipe.html"
+model="index_model.html"
 pattern="<!-- App scripts -->"
+
+shopt -s nullglob
+shopt -s globstar
 
 function scrivi () {
 	sed "/${pattern}/q" <"${model}"
@@ -11,7 +14,7 @@ function scrivi () {
 	m="static/main.js"
 	echo "    <script src=\"${m}\"></script>"
 
-	for i in static/**.js
+	for i in static/**/*.js
 	do
 		[[ ${i} == ${m} ]] ||
 		echo "    <script src=\"${i}\"></script>"

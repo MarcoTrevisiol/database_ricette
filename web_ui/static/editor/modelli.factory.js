@@ -1,6 +1,6 @@
 angular
     .module('recipes')
-    .factory('ModelliFactory', ModelliFactory)
+    .factory('ModelliFactory', ModelliFactory);
 
 function ModelliFactory() {
     var modelli = {

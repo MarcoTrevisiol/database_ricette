@@ -1,18 +1,14 @@
 angular
     .module('recipes')
-    .controller('Controller', ['ModelliFactory', 'ApiRicetteFactory', 'NormalizzaDosiFactory', '$timeout', '$log', Controller]);
+    .controller('EditorController', ['RicettaFactory', 'ModelliFactory', 'ApiRicetteFactory', '$log', EditorController]);
 
 
-function Controller(ModelliFactory, ApiRicetteFactory, NormalizzaDosiFactory, $timeout, $log) {
+function EditorController(RicettaFactory, ModelliFactory, ApiRicetteFactory, $log) {
     var vm = this;
-    vm.ricetta = {};
-    vm.ricetta.titolo = "Titolo della ricetta";
-    vm.dosi = 4;
+    vm.ricetta = RicettaFactory;
     vm.fotoPortate = ApiRicetteFactory.GetPortate();
     vm.portate = Object.keys(vm.fotoPortate);
     vm.ricetta.portata = vm.portate[0];
-    
-    vm.ricetta.tempo = 'PT30M';
     
     vm.periodi = ApiRicetteFactory.GetPeriodi();
     vm.nomiPeriodi = Object.keys(vm.periodi);
@@ -68,25 +64,12 @@ function Controller(ModelliFactory, ApiRicetteFactory, NormalizzaDosiFactory, $t
         return contenitore.indexOf(oggetto) == contenitore.length-1;
     };
     
-    vm.MandaRichiesta = function () {
+    vm.ricetta.Carica = function () {
         vm.ricetta['periodo'] = [];
         for (m in vm.mesi) {
             if (vm.mesiSelezionati[vm.mesi[m]])
                 vm.ricetta['periodo'].push(vm.mesi[m]);
         }
         vm.ricetta['categorie'] = vm.categorie.split(/[,;.:]/).filter(value => value != '');
-        
-        NormalizzaDosiFactory.Normalizza(vm.ricetta, vm.dosi);
-        $log.log(vm.ricetta);
-        ApiRicetteFactory.PostRicetta(vm.ricetta)
-            .then(function (response) {
-                NormalizzaDosiFactory.Normalizza(vm.ricetta, 1/vm.dosi);
-                vm.posto = {
-                    status: response.status,
-                    codice: response.data.codice,
-                    messaggio: response.data.messaggio,
-                }
-                $timeout(function () { vm.posto.status = 0; }, 10000);
-            });
     };
 };
