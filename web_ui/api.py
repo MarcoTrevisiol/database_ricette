@@ -3,16 +3,6 @@ import json
 import string
 import random
 
-template_location = "answer_templates/"
-template_error = "{}error.html".format(template_location)
-
-
-def ciao(*args, **kwargs):
-    print(os.getcwd())
-    ciao_filename = "{}ciao.html".format(template_location)
-    with open(ciao_filename) as file:
-        return file.read()
-
 
 def errore(*args, **kwargs):
     risposta = {
