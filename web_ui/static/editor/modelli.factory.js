@@ -8,34 +8,45 @@
         
     function ModelliFactory() {
         var modelli = {
-            'ingrediente': function () {
-                this.nome = '';
-                this.principale = false;
-                this.quantita = {'valore': '', 'unita': ''};
+            'ingrediente': ingrediente,
+            'variante': variante,
+            'parte': parte,
+            'partePrincipale': partePrincipale,
+        };
+        var service = {
+            Modello: function (modello) {
+                return new modelli[modello]();
             },
-            'variante': function () {
+        };
+        
+        return service;
+        
+        
+        function ingrediente () {
+            this.nome = '';
+            this.principale = false;
+            this.quantita = {'valore': '', 'unita': ''};
+        };
+        
+        function variante() {
                 this.ingredienti = [];
                 this.procedura = '';
-            }
         };
-        modelli['parte'] = function () {
+        
+        function parte() {
             this.nome = 'parte secondaria';
             this.ingredienti = [new modelli['ingrediente']()];
             this.procedura = '';
             this.varianti = [];
         };
-        modelli['partePrincipale'] = function () {
+        
+        function partePrincipale() {
             this.nome = 'parte principale';
             this.ingredienti = [
                 new modelli['ingrediente'](),
             ];
             this.procedura = '';
             this.varianti = [];
-        };
-        return {
-            Modello: function (modello) {
-                return new modelli[modello]();
-            },
         };
     };
 })();

@@ -6,10 +6,12 @@
         .factory('RicettaFactory', RicettaFactory);
 
     function RicettaFactory() {
-        return {
+        var service = {
             dosi: 4,
             titolo: "Titolo della ricetta",
             tempo: 'PT30M',
         };
+        
+        return service;
     };
 })();
