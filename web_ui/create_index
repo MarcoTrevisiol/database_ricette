@@ -1,0 +1,26 @@
+#!/bin/bash
+
+index="index.html"
+
+model="static/new_recipe.html"
+pattern="<!-- App scripts -->"
+
+function scrivi () {
+	sed "/${pattern}/q" <"${model}"
+
+	m="static/main.js"
+	echo "    <script src=\"${m}\"></script>"
+
+	for i in static/**.js
+	do
+		[[ ${i} == ${m} ]] ||
+		echo "    <script src=\"${i}\"></script>"
+	done
+	sed "0,/${pattern}/d" <"${model}"
+} >"${index}"
+
+
+inotifywait -m -r -e move,create,delete --format '%f' "static/" | while read file_name
+do
+	[[ ${file_name} =~ .*js ]] && scrivi >"${index}"
+done

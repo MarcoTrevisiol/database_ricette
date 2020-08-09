@@ -1,2 +1,2 @@
 angular
-    .module('recipes', []);
+    .module('recipes', ['ngRoute']);
