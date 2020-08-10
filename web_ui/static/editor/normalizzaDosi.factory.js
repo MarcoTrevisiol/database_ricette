@@ -15,15 +15,15 @@
         
         
         function Normalizza(ricetta, dosi) {
-            for (p in ricetta.parti) {
-                parte = ricetta.parti[p];
-                for (i in parte.ingredienti) {
-                    ingrediente = parte.ingredienti[i];
+            for (var p in ricetta.parti) {
+                var parte = ricetta.parti[p];
+                for (var i in parte.ingredienti) {
+                    var ingrediente = parte.ingredienti[i];
                     ingrediente.quantita.valore /= dosi;
                 }
-                for (v in parte.varianti) {
-                    for (i in parte.varianti[v].ingredienti) {
-                        ingrediente = parte.varianti[v].ingredienti[i];
+                for (var v in parte.varianti) {
+                    for (var i in parte.varianti[v].ingredienti) {
+                        var ingrediente = parte.varianti[v].ingredienti[i];
                         ingrediente.quantita.valore /= dosi;
                     }
                 }

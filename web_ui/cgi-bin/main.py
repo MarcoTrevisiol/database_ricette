@@ -18,9 +18,12 @@ spec.loader.exec_module(api_module)
 
 
 if 'CONTENT_LENGTH' in os.environ:
-    post_length = int(os.environ['CONTENT_LENGTH'])
-    # post_length stores byte count, but stdin.read, apparently, takes the character count
-    req_corpo = sys.stdin.buffer.read(post_length).decode('utf-8')
+    try:
+        post_length = int(os.environ['CONTENT_LENGTH'])
+        # post_length stores byte count, but stdin.read, apparently, takes the character count
+        req_corpo = sys.stdin.buffer.read(post_length).decode('utf-8')
+    except ValueError:
+        req_corpo = None
 else:
     req_corpo = None
 
@@ -40,7 +43,7 @@ try:
         print('Errore! Risposta vuota!')
     elif response[0] == '<':
         print("Content-Type: text/html\n")
-    elif response[0] == '{':
+    elif response[0] in '{[':
         print("Content-Type: application/json\n")
     print(response)
 except AttributeError:

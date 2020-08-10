@@ -18,7 +18,7 @@ def nuova_ricetta(*args, **kwargs):
     # controllo che sia json
     try:
         j_corpo = json.loads(corpo)
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, TypeError):
         return errore(messaggio='json mal formato')
 
     # controllo che ci sia un titolo
@@ -43,7 +43,7 @@ def nuova_ricetta(*args, **kwargs):
     # tolgo il valore "dosi" portato dall'interfaccia angular
     try:
         del j_corpo['dosi']
-    except ValueError:
+    except KeyError:
         pass
 
     # salvo la nuova ricetta nel database
@@ -59,3 +59,29 @@ def nuova_ricetta(*args, **kwargs):
         'messaggio': "Nuova ricetta registrata correttamente",
     }
     return json.dumps(risposta)
+
+
+def lista_ricette(*args, **kwargs):
+    database_filename = '../catalogo_ricette.json'
+    with open(database_filename) as c_file:
+        catalogo = json.load(c_file)
+
+    lista_titoli = [(r.get('id', '###'), r.get('titolo', '')) for r in catalogo]
+    return json.dumps(lista_titoli)
+
+
+def ottieni_ricetta(*args, **kwargs):
+    database_filename = '../catalogo_ricette.json'
+    with open(database_filename) as c_file:
+        catalogo = json.load(c_file)
+
+    id = kwargs.get('query', '####')
+    ricetta = [r for r in catalogo if r.get('id', '###') == id]
+
+    if len(ricetta) > 1:
+        raise KeyError('Id collision on {}'.format(database_filename))
+
+    if len(ricetta) == 0:
+        return '{}'
+
+    return json.dumps(ricetta[0])

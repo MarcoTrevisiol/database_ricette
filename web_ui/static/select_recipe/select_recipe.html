@@ -1,0 +1,14 @@
+<div class="w3-responsive">
+    <table class="w3-table w3-centered">
+        <tr>
+            <th>Ricetta</th>
+            <th>Modifica</th>
+        </tr>
+        <tr ng-repeat="t in vm.titoli">
+            <td>{{t[1]}}</td>
+            <td>
+                <a href="{{'#!/modifica_ricetta/:' + t[0]}}" class="w3-button">modifica</a>
+            </td>
+        </tr>
+    </table>
+</div>
