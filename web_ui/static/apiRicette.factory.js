@@ -12,6 +12,7 @@
             nuova_ricetta: '/cgi-bin/main.py/nuova_ricetta',
             lista_ricette: '/cgi-bin/main.py/lista_ricette',
             ottieni_ricetta: '/cgi-bin/main.py/ottieni_ricetta?',
+            update_ricetta: '/cgi-bin/main.py/update_ricetta?',
         };
         var service = {
             PostRicetta: PostRicetta,
@@ -19,6 +20,7 @@
             GetPeriodi: GetPeriodi,
             GetListaRicette: GetListaRicette,
             GetRicetta: GetRicetta,
+            UpdateRicetta: UpdateRicetta,
         };
         
         return service;
@@ -54,6 +56,10 @@
         
         function GetRicetta(ricettaId) {
             return $http.get(urls.ottieni_ricetta + ricettaId);
+        };
+        
+        function UpdateRicetta(ricettaId, ricetta) {
+            return $http.post(urls.update_ricetta + ricettaId, ricetta);
         };
     };
 })();

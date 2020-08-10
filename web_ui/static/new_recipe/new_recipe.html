@@ -2,10 +2,10 @@
     <editor titolo="Nuova ricetta"></editor>
     <div class="w3-padding">
         <div class="w3-card-2 w3-round-large">
-            <div class="w3-container w3-round-large" ng-show="vm.posto.status == 200"
+            <div class="w3-container w3-round-large" ng-show="vm.posto.status != 0"
                  ng-class="{'w3-pale-red': vm.posto.codice == 'errore',
                             'w3-pale-green': vm.posto.codice == 'ok'}">
-                <span class="w3-xxlarge">{{vm.posto.codice}}</span>
+                <span class="w3-xxlarge">{{vm.posto.codice || vm.posto.status}}</span>
                 <span class="w3-margin-left">{{vm.posto.messaggio}}</span>
             </div>
             <button class="w3-button w3-block w3-round-large w3-theme-d1 w3-hover-yellow"
