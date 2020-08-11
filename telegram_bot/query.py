@@ -53,6 +53,8 @@ def equal_enough(left_term, right_term):
 
 
 def belong_enough(term, dictionary):
+    if len(dictionary) == 0:
+        return False
     termine = min(dictionary, key=lambda x: Levenshtein.distance(term, x))
     return Levenshtein.distance(term, termine) < soglia
 
@@ -86,7 +88,23 @@ def query_ricette(**kwargs):
                 return False
         return True
 
-    return [(r.get('id', '###'), r.get('titolo', '')) for r in catalogo if do_pass_filter(r)]
+    def stringify_duration(iso):
+        duration = isodate.parse_duration(iso)
+        humanized = ''
+        if duration.days > 0:
+            humanized += '{}d'.format(duration.days)
+        remaining = duration.seconds
+        if remaining // 3600 > 0:
+            humanized += '{}h'.format(remaining // 3600)
+            remaining -= remaining // 3600 * 3600
+        if remaining // 60 > 0:
+            humanized += "{}'".format(remaining // 60)
+        if humanized == '':
+            humanized = "0'"
+        return humanized
+
+    return [(r.get('id', '###'), r.get('titolo', ''), stringify_duration(r.get('tempo', 'PT0M')))
+            for r in catalogo if do_pass_filter(r)]
 
 
 def query_by_id(id):

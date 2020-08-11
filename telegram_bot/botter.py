@@ -87,8 +87,13 @@ def stringify_parti(parti, dosi):
 def stringify_ricetta(ricetta, dosi=1):
     text_titolo = ricetta.get('titolo', 'Titolo')
     text_corpo = stringify_parti(ricetta.get('parti', []), dosi)
+    fonte = ricetta.get('fonte', '')
+    if fonte == '':
+        text_fonte = ''
+    else:
+        text_fonte = '\n  Fonte: {}'.format(fonte)
 
-    return "<b>{}</b>:\n{}".format(text_titolo, text_corpo)
+    return "<b>{}</b>:\n{}{}".format(text_titolo, text_corpo, text_fonte)
 
 
 def get_close_match(token, dictionary):
@@ -122,10 +127,10 @@ def build_query_kwargs(tokens):
     for token in tokens:
         if Levenshtein.distance(token, 'tutti') < soglia:
             return {}
-        
+
         query_type = detect_query_type(token)
         query_kwargs[query_type] = token
-        logging.info("token {} interpretato come {}".format(token, query_type))
+        logging.info("token \"{}\" interpretato come {}".format(token, query_type))
     return query_kwargs
 
 
@@ -184,8 +189,21 @@ def query_callback(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
         return
 
-    text_lista = '\n'.join(["/id{} {}".format(*r_pair) for r_pair in lista_ricette])
-    text_message = "Ricette presenti:\n{}".format(text_lista)
+    text_lista = '\n'.join(["/id{} {} ({})".format(*r_pair) for r_pair in lista_ricette])
+    text_message = "Ecco le ricette che ho trovato:\n{}".format(text_lista)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
+
+
+def categorie_callback(update, context):
+    categorie = query_module.query_categorie() | query_module.query_globali(chiave='portata')
+
+    try:
+        categorie.remove('')
+    except KeyError:
+        pass
+
+    text_lista = '\n'.join(sorted([cat.lower() for cat in categorie]))
+    text_message = "Ecco le categorie che ho trovato:\n{}".format(text_lista)
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
 
 
@@ -201,6 +219,7 @@ def main_bot():
     # dispatcher.add_handler(te.CommandHandler("id", id_callback))
     dispatcher.add_handler(te.MessageHandler(te.Filters.regex(r'^/id'), id_callback))
     dispatcher.add_handler(te.CommandHandler("dosi", dosi_callback))
+    dispatcher.add_handler(te.CommandHandler("categorie", categorie_callback))
     dispatcher.add_handler(te.MessageHandler(te.Filters.text, query_callback))
 
     updater.start_polling()
