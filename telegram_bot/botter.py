@@ -1,20 +1,16 @@
 import logging
+import logging.config
 import configparser
 import importlib.util
 import telegram.ext as te
+import telegram as tele
+import Levenshtein
 
 conf_filename = "coordinates"
 configuration = configparser.ConfigParser()
 configuration.read(conf_filename)
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler(configuration['filenames']['log']),
-        logging.StreamHandler()
-    ]
-)
+logging.config.fileConfig(configuration['filenames']['logconf'])
 
 query_module_name = 'query_catalogo'
 query_module_filepath = 'query.py'
@@ -24,15 +20,27 @@ spec.loader.exec_module(query_module)
 
 
 def stringify_ingrediente(ingrediente, dosi):
-    template = "{v}{u} {nome}"
     valore = ingrediente.get('quantita', {}).get('valore', 0) * dosi
+
     if valore == int(valore):
         valore = int(valore)
-    if valore is float:
+
+    template = "{v}{u} {nome}"
+    if valore in (0, 1):
+        if ingrediente.get('quantita', {}).get('unita', '') == '':
+            template = "{nome}"
+        else:
+            template = "{u} {nome}"
+    elif valore is float:
         template = "{v:04.2f}{u} {nome}"
+
+    if ingrediente.get('annotazioni', '') != '':
+        template += " ({ann})"
+
     return template.format(v=valore,
                           u=ingrediente.get('quantita', {}).get('unita', ''),
-                          nome=ingrediente.get('nome', ''))
+                          nome=ingrediente.get('nome', ''),
+                          ann=ingrediente.get('annotazioni', ''))
 
 
 def stringify_ingredienti(lista, dosi):
@@ -42,24 +50,26 @@ def stringify_ingredienti(lista, dosi):
 def stringify_variante(variante, dosi):
     text_variante = "Variante\n"
     if len(variante.get('ingredienti', [])) > 0:
-        text_ingredienti = "Ingredienti:\n{}\n".format(stringify_ingredienti(variante.get('ingredienti', []), dosi))
+        text_ingredienti = "<i>Ingredienti:</i>\n{}\n".format(
+            stringify_ingredienti(variante.get('ingredienti', []), dosi)
+        )
         text_variante += text_ingredienti
     if len(variante.get('procedura', '')) > 1:
-        text_procedura = "Procedura:\n{}\n".format(variante.get('procedura'))
+        text_procedura = "<i>Procedura:</i>\n{}\n".format(variante.get('procedura'))
         text_variante += text_procedura
     return text_variante
 
 
 def stringify_parte(parte, dosi, con_nome=False):
-    text_ingredienti = "Ingredienti:\n{}\n".format(stringify_ingredienti(parte.get('ingredienti', []), dosi))
+    text_ingredienti = "<i>Ingredienti:</i>\n{}\n".format(stringify_ingredienti(parte.get('ingredienti', []), dosi))
     if len(parte.get('procedura', '')) > 0:
-        text_procedura = "Procedura:\n{}\n".format(parte.get('procedura'))
+        text_procedura = "<i>Procedura:</i>\n{}\n".format(parte.get('procedura'))
     else:
         text_procedura = ''
     text_varianti = '\n'.join([stringify_variante(v, dosi) for v in parte.get('varianti')])
 
     if con_nome:
-        return "per {}:\n{}{}\n{}".format(parte.get('nome', 'questa parte'),
+        return "<b>per {}</b>:\n{}{}\n{}".format(parte.get('nome', 'questa parte'),
                                               text_ingredienti, text_procedura, text_varianti)
     else:
         return "{}{}\n{}".format(text_ingredienti, text_procedura, text_varianti)
@@ -78,7 +88,45 @@ def stringify_ricetta(ricetta, dosi=1):
     text_titolo = ricetta.get('titolo', 'Titolo')
     text_corpo = stringify_parti(ricetta.get('parti', []), dosi)
 
-    return "{}:\n{}".format(text_titolo, text_corpo)
+    return "<b>{}</b>:\n{}".format(text_titolo, text_corpo)
+
+
+def get_close_match(token, dictionary):
+    termine = min(dictionary, key=lambda x: Levenshtein.distance(x.lower(), token.lower()))
+    distance = Levenshtein.distance(termine.lower(), token.lower())
+    logging.debug("{} è la migliore approssimazione di {}, dista {}".format(termine, token, distance))
+    return distance
+
+
+soglia = 2
+
+
+def detect_query_type(token):
+    checks = [
+        ('portata', query_module.query_globali(chiave='portata')),
+        ('categoria', query_module.query_categorie()),
+        ('ingrediente', query_module.query_ingredienti()),
+    ]
+    for ch in checks:
+        distance = get_close_match(token, ch[1])
+        if distance < soglia:
+            return ch[0]
+
+    if token is not None:
+        return 'titolo'
+    raise KeyError
+
+
+def build_query_kwargs(tokens):
+    query_kwargs = {}
+    for token in tokens:
+        if Levenshtein.distance(token, 'tutti') < soglia:
+            return {}
+        
+        query_type = detect_query_type(token)
+        query_kwargs[query_type] = token
+        logging.info("token {} interpretato come {}".format(token, query_type))
+    return query_kwargs
 
 
 def start_callback(update, context):
@@ -127,7 +175,15 @@ def dosi_callback(update, context):
 
 
 def query_callback(update, context):
-    lista_ricette = query_module.query_ricette()
+    query_kwargs = build_query_kwargs(update.effective_message.text.split(','))
+    lista_ricette = query_module.query_ricette(**query_kwargs)
+
+    if len(lista_ricette) == 0:
+        text_message = "Nessuna ricetta soddisfa i parametri di ricerca inseriti."
+        logging.info("ricerca vuota: {}".format(query_kwargs))
+        context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
+        return
+
     text_lista = '\n'.join(["/id{} {}".format(*r_pair) for r_pair in lista_ricette])
     text_message = "Ricette presenti:\n{}".format(text_lista)
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
@@ -135,9 +191,10 @@ def query_callback(update, context):
 
 def main_bot():
     persistence = te.PicklePersistence(filename=configuration["filenames"]["persistence"])
+    defaults = te.Defaults(parse_mode=tele.ParseMode.HTML)
     with open(configuration["filenames"]["token"]) as token_file:
         token = token_file.read().strip()
-    updater = te.Updater(token=token, use_context=True, persistence=persistence)
+    updater = te.Updater(token=token, use_context=True, persistence=persistence, defaults=defaults)
 
     dispatcher = updater.dispatcher
     dispatcher.add_handler(te.CommandHandler("start", start_callback))
@@ -145,7 +202,6 @@ def main_bot():
     dispatcher.add_handler(te.MessageHandler(te.Filters.regex(r'^/id'), id_callback))
     dispatcher.add_handler(te.CommandHandler("dosi", dosi_callback))
     dispatcher.add_handler(te.MessageHandler(te.Filters.text, query_callback))
-
 
     updater.start_polling()
     updater.idle()

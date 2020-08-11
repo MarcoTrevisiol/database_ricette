@@ -4,6 +4,6 @@ username=RicettePersonaliBot
 contacturl=http://t.me/RicettePersonaliBot
 
 [filenames]
-log=bot.log
+logconf=logger.ini
 token=token
 persistence=persistence.pickle
