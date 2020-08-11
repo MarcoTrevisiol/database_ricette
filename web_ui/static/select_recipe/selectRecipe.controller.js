@@ -7,6 +7,7 @@
 
     SelectRecipeController.$inject = ['ApiRicetteFactory', 'RicettaFactory', '$log'];
 
+    
     function SelectRecipeController(ApiRicetteFactory, RicettaFactory, $log) {
         var vm = this;
         vm.titoli = [];
@@ -20,7 +21,7 @@
                 vm.titoli = answer.data;
                 $log.log(answer.data);
             });
-        };
+        }
 
-    };
+    }
 })();

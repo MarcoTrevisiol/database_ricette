@@ -3,11 +3,11 @@
 
     angular
         .module('recipes')
-        .directive('editor', EditorDirective)
+        .directive('editor', EditorDirective);
 
         
     function EditorDirective() {
-        return {
+        var directive = {
             restrict: 'E',
             bindToController: true,
             controller: 'EditorController',
@@ -17,5 +17,7 @@
                 titolo: '@',
             }
         };
-    };
+        
+        return directive;
+    }
 })();

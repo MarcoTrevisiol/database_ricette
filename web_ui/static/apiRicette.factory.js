@@ -3,7 +3,7 @@
     
     angular
         .module('recipes')
-        .factory('ApiRicetteFactory', ApiRicetteFactory)
+        .factory('ApiRicetteFactory', ApiRicetteFactory);
 
     ApiRicetteFactory.$inject = ['$http'];
 
@@ -28,7 +28,7 @@
         
         function PostRicetta(ricetta) {
             return $http.post(urls.nuova_ricetta, ricetta);
-        };
+        }
         
         function GetPortate() {
             return {
@@ -37,7 +37,7 @@
                 'Contorno': 'resources/Contorno.jpg',
                 'Dolce': 'resources/Dolce.jpg',
             };
-        };
+        }
         
         function GetPeriodi() {
             return {
@@ -48,18 +48,18 @@
                 'Tutti': ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'],
                 'Niente': [],
             };
-        };
+        }
         
         function GetListaRicette() {
             return $http.get(urls.lista_ricette);
-        };
+        }
         
         function GetRicetta(ricettaId) {
             return $http.get(urls.ottieni_ricetta + ricettaId);
-        };
+        }
         
         function UpdateRicetta(ricettaId, ricetta) {
             return $http.post(urls.update_ricetta + ricettaId, ricetta);
-        };
-    };
+        }
+    }
 })();

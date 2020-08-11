@@ -44,7 +44,7 @@
             }
             $log.log(vm.mesiSelezionati);
             vm.categorie = vm.ricetta['categorie'].join();
-        };
+        }
         
         
         function SetMesi(periodo) {
@@ -56,7 +56,7 @@
                 $log.log(vm.mesi[m], daAggiungere);
                 vm.mesiSelezionati[vm.mesi[m]] = daAggiungere;
             }
-        };        
+        }
         
         
         function Carica() {
@@ -66,13 +66,13 @@
                     vm.ricetta['periodo'].push(vm.mesi[m]);
             }
             vm.ricetta['categorie'] = vm.categorie.split(/[,;.:]/).filter(value => value != '');
-        };
+        }
         
         
         function Aggiungi(contenitore, modello) {
             contenitore.push(ModelliFactory.Modello(modello));
-        };
-    };
+        }
+    }
     
     
     function Togli(contenitore, oggetto) {
@@ -80,7 +80,7 @@
         if (index > -1) {
             contenitore.splice(index, 1);
         }
-    };
+    }
     
     function Muovi(contenitore, oggetto, direzione) {
         var index = contenitore.indexOf(oggetto);
@@ -92,16 +92,16 @@
             contenitore.splice(index, 1);
             contenitore.splice(index + direzione, 0, oggetto);
         }
-    };
+    }
     
     
     function EPrimo(contenitore, oggetto) {
         return contenitore.indexOf(oggetto) == 0;
-    };
+    }
     
     function EUltimo(contenitore, oggetto) {
         return contenitore.indexOf(oggetto) == contenitore.length-1;
-    };
+    }
     
 
 })();

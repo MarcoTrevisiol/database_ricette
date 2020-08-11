@@ -8,10 +8,10 @@
         
     function ModelliFactory() {
         var modelli = {
-            'ingrediente': ingrediente,
-            'variante': variante,
-            'parte': parte,
-            'partePrincipale': partePrincipale,
+            'ingrediente': Ingrediente,
+            'variante': Variante,
+            'parte': Parte,
+            'partePrincipale': PartePrincipale,
         };
         var service = {
             Modello: function (modello) {
@@ -22,31 +22,31 @@
         return service;
         
         
-        function ingrediente () {
+        function Ingrediente () {
             this.nome = '';
             this.principale = false;
             this.quantita = {'valore': '', 'unita': ''};
-        };
+        }
         
-        function variante() {
+        function Variante() {
                 this.ingredienti = [];
                 this.procedura = '';
-        };
+        }
         
-        function parte() {
+        function Parte() {
             this.nome = 'parte secondaria';
             this.ingredienti = [new modelli['ingrediente']()];
             this.procedura = '';
             this.varianti = [];
-        };
+        }
         
-        function partePrincipale() {
+        function PartePrincipale() {
             this.nome = 'parte principale';
             this.ingredienti = [
                 new modelli['ingrediente'](),
             ];
             this.procedura = '';
             this.varianti = [];
-        };
+        }
     };
 })();
