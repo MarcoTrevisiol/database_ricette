@@ -18,6 +18,12 @@
         function activate() {
             RicettaFactory.ricetta = ricettaPrepService.data;
             RicettaFactory.Normalizza(RicettaFactory.ricetta, 1/RicettaFactory.dosi);
+            for (var p in RicettaFactory.ricetta.parti) {
+                var parte = RicettaFactory.ricetta.parti[p];
+                if (! (parte.hasOwnProperty('varianti'))) {
+                    parte['varianti'] = [];
+                }
+            }
         }
         
         

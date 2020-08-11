@@ -13,7 +13,6 @@
         vm.ricetta = RicettaFactory.ricetta;
         vm.fotoPortate = ApiRicetteFactory.GetPortate();
         vm.portate = Object.keys(vm.fotoPortate);
-        vm.ricetta.portata = vm.portate[0];
         
         vm.periodi = ApiRicetteFactory.GetPeriodi();
         vm.nomiPeriodi = Object.keys(vm.periodi);
@@ -44,6 +43,10 @@
             }
             $log.log(vm.mesiSelezionati);
             vm.categorie = vm.ricetta['categorie'].join();
+            
+            if (!(vm.ricetta.hasOwnProperty('portata')) || vm.ricetta.portata == '') {
+                vm.ricetta.portata = vm.portate[0];
+            }
         }
         
         

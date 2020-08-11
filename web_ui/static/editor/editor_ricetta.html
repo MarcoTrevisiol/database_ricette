@@ -11,22 +11,26 @@
                     <input type="text" class="w3-input w3-theme-light w3-border" ng-model="editor.ricetta.titolo">
                 </div>
                 <div class="w3-col w3-half">
-                    <label>Dosi per quante persone</label>
-                    <input type="number" class="w3-input w3-theme-light w3-border" ng-model="editor.ricettaHandle.dosi"
-                           min="0">
+                    <label>Fonte</label>
+                    <input type="text" class="w3-input w3-theme-light w3-border" ng-model="editor.ricetta.fonte">
                 </div>
             </div>
             <div class="w3-row">
-                <div class="w3-col w3-half">
+                <div class="w3-col w3-third">
                     <label>Tipo di portata</label>
                     <select class="w3-input w3-border w3-theme-light" ng-model="editor.ricetta.portata">
                         <option value="{{c}}" ng-repeat="c in editor.portate" ng-selected="$first">{{c}}</option>
                     </select>
                 </div>
-                <div class="w3-col w3-half">
+                <div class="w3-col w3-third">
                     <label>Tempo di preparazione</label>
                     <input type="number" class="w3-input w3-theme-light w3-border" ng-model="editor.ricetta.tempo"
                            min="0" step="5" rec-duration>
+                </div>
+                <div class="w3-col w3-third">
+                    <label>Dosi per quante persone</label>
+                    <input type="number" class="w3-input w3-theme-light w3-border" ng-model="editor.ricettaHandle.dosi"
+                           min="0">
                 </div>
             </div>
             <div class="w3-margin-top">
