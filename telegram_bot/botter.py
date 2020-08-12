@@ -3,6 +3,7 @@ import logging.config
 import configparser
 import importlib.util
 import json
+import re
 import telegram.ext as te
 import telegram as tele
 import Levenshtein
@@ -116,6 +117,9 @@ def detect_query_type(token):
         if distance < soglia_tolleranza:
             return ch[0]
 
+    match = re.search(r"^[0-9]+\s*[dhm']", token)
+    if match is not None:
+        return 'tempo'
     if token is not None:
         return 'titolo'
     raise KeyError
@@ -166,7 +170,8 @@ def start_callback(update, context):
 
 
 def help_callback(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text=configuration['help']['message'])
+    text_help = configuration['help']['message'].replace('\\n', '\n')
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text_help)
     logging.info("help with update={}".format(logg_stringify_update(update)))
 
 

@@ -1,4 +1,5 @@
 import json
+import re
 import datetime
 import isodate
 import locale
@@ -60,6 +61,18 @@ def belong_enough(term, dictionary):
     return Levenshtein.distance(term, termine) < soglia
 
 
+def compute_duration(token):
+    match = re.search(r"^([0-9]+)\s*([dhm'])", token)
+    amount = int(match.group(1))
+    if match.group(2) in ["'", "m"]:
+        return amount
+    if match.group(2) == "h":
+        return amount * 60
+    if match.group(2) == "d":
+        return amount * 60 * 24
+    return 0
+
+
 def query_ricette(**kwargs):
     with open(catalogo_file) as c_file:
         catalogo = json.load(c_file)
@@ -85,7 +98,8 @@ def query_ricette(**kwargs):
             if not belong_enough(kwargs['ingrediente'].lower(), ingredienti):
                 return False
         if 'tempo' in kwargs.keys():
-            if not datetime.timedelta(minutes=kwargs['tempo']) >= isodate.parse_duration(r.get('tempo', 'PT0M')):
+            if not datetime.timedelta(minutes=compute_duration(kwargs['tempo'])) >=\
+                   isodate.parse_duration(r.get('tempo', 'PT0M')):
                 return False
         return True
 
