@@ -3,6 +3,7 @@ Description=Fornisco ricette
 About=Tieni le tue ricette sempre a portata di chat.
 Commands="""
 dosi - Imposta le dosi per le quantità degli ingredienti
+stagione - Cambia la ricerca per stagione
 portate - Naviga portate e categorie presenti
 id___ - Ottieni la descrizione completa della ricetta
 aiuto - Semplice messaggio di aiuto

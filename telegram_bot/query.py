@@ -62,13 +62,13 @@ def belong_enough(term, dictionary):
 
 
 def compute_duration(token):
-    match = re.search(r"^([0-9]+)\s*([dhm'])", token)
+    match = re.search(r"^([0-9]+)\s*([dgho'm])", token)
     amount = int(match.group(1))
-    if match.group(2) in ["'", "m"]:
+    if match.group(2) in list("'m"):
         return amount
-    if match.group(2) == "h":
+    if match.group(2) in list("ho"):
         return amount * 60
-    if match.group(2) == "d":
+    if match.group(2) in list("dg"):
         return amount * 60 * 24
     return 0
 

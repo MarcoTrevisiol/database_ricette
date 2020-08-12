@@ -117,7 +117,7 @@ def detect_query_type(token):
         if distance < soglia_tolleranza:
             return ch[0]
 
-    match = re.search(r"^[0-9]+\s*[dhm']", token)
+    match = re.search(r"^[0-9]+\s*[dgho'm]", token)
     if match is not None:
         return 'tempo'
     if token is not None:
@@ -128,6 +128,7 @@ def detect_query_type(token):
 def build_query_kwargs(tokens):
     query_kwargs = {}
     for token in tokens:
+        token = token.strip()
         if Levenshtein.distance(token, 'tutti') < soglia_tolleranza:
             return {}
 
@@ -137,9 +138,12 @@ def build_query_kwargs(tokens):
     return query_kwargs
 
 
-def query_answer(lista_ricette):
+def query_answer(lista_ricette, stagionalita=True):
     if len(lista_ricette) == 0:
-        text_message = "Nessuna ricetta soddisfa i parametri di ricerca inseriti."
+        if stagionalita:
+            text_message = "Nessuna ricetta di stagione soddisfa i parametri di ricerca inseriti."
+        else:
+            text_message = "Nessuna ricetta soddisfa i parametri di ricerca inseriti."
     else:
         text_lista = '\n'.join(["{1} ({2}) /id{0}".format(*r_pair)
                                 for r_pair in sorted(lista_ricette, key=lambda x: x[1])])
@@ -217,15 +221,28 @@ def dosi_callback(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
 
 
+def stagione_callback(update, context):
+    logging.info("stagione with update={}".format(logg_stringify_update(update)))
+    stagionalita_attuale = context.chat_data.get('stagione', True)
+    context.chat_data['stagione'] = not stagionalita_attuale
+    if stagionalita_attuale:
+        text_message = "Ora vengono mostrate tutte le ricette, anche quelle non di stagione"
+    else:
+        text_message = "Ora vengono mostrate solo le ricette di stagione"
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
+
+
 def query_callback(update, context):
     logging.info("query with update={}".format(logg_stringify_update(update)))
     query_kwargs = build_query_kwargs(update.effective_message.text.split(','))
+    if not context.chat_data.get('stagione', True):
+        query_kwargs['periodo'] = True
     lista_ricette = query_module.query_ricette(**query_kwargs)
 
     if len(lista_ricette) == 0:
         logging.info("ricerca vuota: {}".format(query_kwargs))
 
-    text_message = query_answer(lista_ricette)
+    text_message = query_answer(lista_ricette, stagionalita=context.chat_data.get('stagione', True))
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
 
 
@@ -260,12 +277,14 @@ def categorie_button_callback(update, context):
     query = update.callback_query
     data = json.loads(query.data)
     query_kwargs = {data['type']: data['value']}
+    if not context.chat_data.get('stagione', True):
+        query_kwargs['periodo'] = True
     lista_ricette = query_module.query_ricette(**query_kwargs)
 
     if len(lista_ricette) == 0:
         logging.warning("ricerca vuota in risposta a /categorie ({})".format(query_kwargs))
 
-    text_message = query_answer(lista_ricette)
+    text_message = query_answer(lista_ricette, stagionalita=context.chat_data.get('stagione', True))
     # CallbackQueries need to be answered, even if no notification to the user is needed
     query.answer()
     query.edit_message_text(text=text_message)
@@ -319,12 +338,14 @@ def portate_button_callback(update, context):
     if data['S']:
         return keyboard_portata_callback(update, context, data)
 
+    if not context.chat_data.get('stagione', True):
+        data['periodo'] = True
     lista_ricette = query_module.query_ricette(**data)
 
     if len(lista_ricette) == 0:
         logging.info("ricerca vuota in risposta a /categorie ({})".format(data))
 
-    text_message = query_answer(lista_ricette)
+    text_message = query_answer(lista_ricette, stagionalita=context.chat_data.get('stagione', True))
     # CallbackQueries need to be answered, even if no notification to the user is needed
     query.answer()
     query.edit_message_text(text=text_message)
@@ -348,6 +369,7 @@ def main_bot():
     dispatcher.add_handler(te.CommandHandler("aiuto", help_callback))
     dispatcher.add_handler(te.MessageHandler(te.Filters.regex(r'^/id'), id_callback))
     dispatcher.add_handler(te.CommandHandler("dosi", dosi_callback))
+    dispatcher.add_handler(te.CommandHandler("stagione", stagione_callback))
     dispatcher.add_handler(te.CommandHandler("categorie", categorie_callback))
     dispatcher.add_handler(te.CommandHandler("portate", portate_callback))
     dispatcher.add_handler(te.CallbackQueryHandler(portate_button_callback))

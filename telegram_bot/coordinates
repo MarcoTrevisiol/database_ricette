@@ -9,5 +9,4 @@ token=token
 persistence=persistence.pickle
 
 [help]
-message=<i>Fornisco ricette</i>\nper trovare ricette, scrivi i termini di ricerca separati da ','\n/categorie fornisce un elenco delle categorie disponibili\n/dosi permette di visualizzare e modificare il dosaggio di default
-
+message=<i>Sono il tuo assistente culinaro:  Fornisco ricette</i>\nper trovare le ricette puoi scrivermi gli ingredienti principali che hai a disposizione (separati da ",") oppure puoi scrivermi il tempo che hai a disposizione\n\nEcco cosa puoi fare con i comandi:\n/portate permette di navigare fra le portate e categorie disponibili\n/dosi permette di visualizzare e modificare il dosaggio di default\n/stagione permette di cambiare modalità di ricerca (solo ricette di stagione vs. tutte)
