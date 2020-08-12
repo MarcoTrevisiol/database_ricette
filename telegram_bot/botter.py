@@ -144,8 +144,20 @@ def query_answer(lista_ricette):
 
 
 def logg_stringify_update(update):
-    template = "|Chat:{}|Message:'text'='{}';'date'='{}'|"
-    return template.format(update.effective_chat, update.effective_message.text, update.effective_message.date)
+    try:
+        segno = "|Chat:{}|Message:'text'='{}';'callback_query'='{}';'date'='{}'|".format(
+            update.effective_chat,
+            update.effective_message.text,
+            update.callback_query.data,
+            update.effective_message.date
+        )
+    except AttributeError:
+        segno = "|Chat:{}|Message:'text'='{}';'date'='{}'|".format(
+            update.effective_chat,
+            update.effective_message.text,
+            update.effective_message.date
+        )
+    return segno
 
 
 def start_callback(update, context):
