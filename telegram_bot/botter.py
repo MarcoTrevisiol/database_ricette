@@ -2,6 +2,7 @@ import logging
 import logging.config
 import configparser
 import importlib.util
+import json
 import telegram.ext as te
 import telegram as tele
 import Levenshtein
@@ -134,8 +135,30 @@ def build_query_kwargs(tokens):
     return query_kwargs
 
 
+def query_answer(lista_ricette):
+    if len(lista_ricette) == 0:
+        text_message = "Nessuna ricetta soddisfa i parametri di ricerca inseriti."
+    else:
+        text_lista = '\n'.join(["/id{} {} ({})".format(*r_pair) for r_pair in lista_ricette])
+        text_message = "Ecco le ricette che ho trovato:\n{}".format(text_lista)
+    return text_message
+
+
 def start_callback(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Fornisco ricette")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="<i>Fornisco ricette</i>")
+
+
+text_help = """
+<i>Fornisco ricette</i>
+per trovare ricette, scrivi i termini di ricerca separati da ','
+/categorie fornisce un elenco delle categorie disponibili
+/dosi permette di visualizzare e modificare il dosaggio di default
+"""
+
+
+def help_callback(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text_help)
+    logging.info('help requested')
 
 
 def id_callback(update, context):
@@ -184,27 +207,56 @@ def query_callback(update, context):
     lista_ricette = query_module.query_ricette(**query_kwargs)
 
     if len(lista_ricette) == 0:
-        text_message = "Nessuna ricetta soddisfa i parametri di ricerca inseriti."
         logging.info("ricerca vuota: {}".format(query_kwargs))
-        context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
-        return
 
-    text_lista = '\n'.join(["/id{} {} ({})".format(*r_pair) for r_pair in lista_ricette])
-    text_message = "Ecco le ricette che ho trovato:\n{}".format(text_lista)
+    text_message = query_answer(lista_ricette)
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
 
 
 def categorie_callback(update, context):
-    categorie = query_module.query_categorie() | query_module.query_globali(chiave='portata')
+    set_portate = query_module.query_globali(chiave='portata')
+    categorie = query_module.query_categorie() | set_portate
 
     try:
         categorie.remove('')
     except KeyError:
         pass
 
-    text_lista = '\n'.join(sorted([cat.lower() for cat in categorie]))
-    text_message = "Ecco le categorie che ho trovato:\n{}".format(text_lista)
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
+    keyboard_lista = []
+    for i, cat in enumerate(sorted(list(categorie))):
+        data = {'type': 'categoria', 'value': cat}
+        if cat in set_portate:
+            data['type'] = 'portata'
+        data = json.dumps(data)
+        if i % 2 == 0:
+            keyboard_lista.append([tele.InlineKeyboardButton(cat, callback_data=data)])
+        else:
+            keyboard_lista[-1].append(tele.InlineKeyboardButton(cat, callback_data=data))
+
+    text_message = "Ecco le categorie che ho trovato:"
+    reply_markup = tele.InlineKeyboardMarkup(keyboard_lista)
+
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text_message, reply_markup=reply_markup)
+
+
+def categorie_button_callback(update, context):
+    query = update.callback_query
+    data = json.loads(query.data)
+    query_kwargs = {data['type']: data['value']}
+    lista_ricette = query_module.query_ricette(**query_kwargs)
+
+    if len(lista_ricette) == 0:
+        logging.info("ricerca vuota in risposta a /categorie ({})".format(query_kwargs))
+
+    text_message = query_answer(lista_ricette)
+    # CallbackQueries need to be answered, even if no notification to the user is needed
+    query.answer()
+    query.edit_message_text(text=text_message)
+
+
+def error_callback(update, context):
+    """Log Errors caused by Updates."""
+    logging.warning('Update "{}" caused error "{}"'.format(update, context.error))
 
 
 def main_bot():
@@ -216,11 +268,14 @@ def main_bot():
 
     dispatcher = updater.dispatcher
     dispatcher.add_handler(te.CommandHandler("start", start_callback))
-    # dispatcher.add_handler(te.CommandHandler("id", id_callback))
+    dispatcher.add_handler(te.CommandHandler('help', help_callback))
+    dispatcher.add_handler(te.CommandHandler('aiuto', help_callback))
     dispatcher.add_handler(te.MessageHandler(te.Filters.regex(r'^/id'), id_callback))
     dispatcher.add_handler(te.CommandHandler("dosi", dosi_callback))
     dispatcher.add_handler(te.CommandHandler("categorie", categorie_callback))
+    dispatcher.add_handler(te.CallbackQueryHandler(categorie_button_callback))
     dispatcher.add_handler(te.MessageHandler(te.Filters.text, query_callback))
+    dispatcher.add_error_handler(error_callback)
 
     updater.start_polling()
     updater.idle()

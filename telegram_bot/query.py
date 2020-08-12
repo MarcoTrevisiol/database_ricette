@@ -100,7 +100,7 @@ def query_ricette(**kwargs):
         if remaining // 60 > 0:
             humanized += "{}'".format(remaining // 60)
         if humanized == '':
-            humanized = "0'"
+            humanized = "?"
         return humanized
 
     return [(r.get('id', '###'), r.get('titolo', ''), stringify_duration(r.get('tempo', 'PT0M')))
