@@ -7,3 +7,7 @@ contacturl=http://t.me/RicettePersonaliBot
 logconf=logger.ini
 token=token
 persistence=persistence.pickle
+
+[help]
+message=<i>Fornisco ricette</i>\nper trovare ricette, scrivi i termini di ricerca separati da ','\n/categorie fornisce un elenco delle categorie disponibili\n/dosi permette di visualizzare e modificare il dosaggio di default
+

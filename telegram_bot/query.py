@@ -17,13 +17,14 @@ def query_globali(chiave='titolo'):
     return set([r.get(chiave, '') for r in catalogo])
 
 
-def query_categorie():
+def query_categorie(with_portata=None):
     with open(catalogo_file) as c_file:
         catalogo = json.load(c_file)
 
     categorie = []
     for r in catalogo:
-        categorie += r.get('categorie', [])
+        if with_portata is None or with_portata.lower() == r.get('portata', '').lower():
+            categorie += r.get('categorie', [])
     return set(categorie)
 
 
