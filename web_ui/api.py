@@ -57,6 +57,7 @@ def nuova_ricetta(*args, **kwargs):
     risposta = {
         'codice': 'ok',
         'messaggio': "Nuova ricetta registrata correttamente",
+        'id': j_corpo['id'],
     }
     return json.dumps(risposta)
 

@@ -5,12 +5,12 @@
         .module('recipes')
         .controller('EditRecipeController', EditRecipeController);
 
-    EditRecipeController.$inject = ['ricettaPrepService', 'RicettaFactory', 'ApiRicetteFactory', '$timeout', '$log'];
+    EditRecipeController.$inject = ['ricettaPrepService', 'RicettaFactory', 'ApiRicetteFactory', 'ResponseFactory', '$timeout', '$log'];
 
-    function EditRecipeController(ricettaPrepService, RicettaFactory, ApiRicetteFactory, $timeout, $log) {
+    function EditRecipeController(ricettaPrepService, RicettaFactory, ApiRicetteFactory, ResponseFactory, $timeout, $log) {
         var vm = this;
         vm.MandaRichiesta = MandaRichiesta;
-        vm.posto = {status: 0};
+        vm.posto = ResponseFactory;
         
         activate();
         
@@ -38,11 +38,9 @@
         
         function Ricevi(response) {
             RicettaFactory.Normalizza(RicettaFactory.ricetta, 1/RicettaFactory.dosi);
-            vm.posto = {
-                status: response.status,
-                codice: response.data.codice,
-                messaggio: response.data.messaggio,
-            }
+            vm.posto.status = response.status;
+            vm.posto.codice = response.data.codice;
+            vm.posto.messaggio = response.data.messaggio;
             $timeout(function () { vm.posto.status = 0; }, 10000);
         }
 
