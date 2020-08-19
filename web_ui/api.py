@@ -159,3 +159,18 @@ def update_ricetta(*args, **kwargs):
         'messaggio': "Ricetta modificata correttamente",
     }
     return json.dumps(risposta)
+
+
+def lista_ingredienti(*args, **kwargs):
+    database_filename = '../catalogo_ricette.json'
+    with open(database_filename) as c_file:
+        catalogo = json.load(c_file)
+
+    ingredienti_totali = []
+    for r in catalogo:
+        for p in r.get('parti', []):
+            ingredienti_totali += p.get('ingredienti', [])
+            for v in p.get('varianti', []):
+                ingredienti_totali += v.get('ingredienti', [])
+
+    return json.dumps(list({i.get('nome', '') for i in ingredienti_totali}))

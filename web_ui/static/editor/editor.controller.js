@@ -20,6 +20,8 @@
         vm.mesi = vm.periodi['Tutti'];
         
         vm.SetMesi = SetMesi;
+        
+        vm.ingredienti = ApiRicetteFactory.GetListaIngredienti();
 
         vm.Togli = Togli;
         vm.Aggiungi = Aggiungi;

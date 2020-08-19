@@ -13,6 +13,7 @@
             lista_ricette: '/cgi-bin/main.py/lista_ricette',
             ottieni_ricetta: '/cgi-bin/main.py/ottieni_ricetta?',
             update_ricetta: '/cgi-bin/main.py/update_ricetta?',
+            lista_ingredienti: '/cgi-bin/main.py/lista_ingredienti',
         };
         var service = {
             PostRicetta: PostRicetta,
@@ -21,6 +22,7 @@
             GetListaRicette: GetListaRicette,
             GetRicetta: GetRicetta,
             UpdateRicetta: UpdateRicetta,
+            GetListaIngredienti: GetListaIngredienti,
         };
         
         return service;
@@ -60,6 +62,10 @@
         
         function UpdateRicetta(ricettaId, ricetta) {
             return $http.post(urls.update_ricetta + ricettaId, ricetta);
+        }
+        
+        function GetListaIngredienti() {
+            return $http.get(urls.lista_ingredienti);
         }
     }
 })();
