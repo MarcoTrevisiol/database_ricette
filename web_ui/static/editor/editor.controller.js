@@ -19,7 +19,6 @@
         vm.categorie = '';
         vm.mesi = vm.periodi['Tutti'];
         
-        vm.mesiSelezionati = {}
         vm.SetMesi = SetMesi;
 
         vm.Togli = Togli;
@@ -27,6 +26,7 @@
         vm.Muovi = Muovi;
         vm.EPrimo = EPrimo;
         vm.EUltimo = EUltimo;
+        vm.Toggle = Toggle;
 
         
         Activate();
@@ -37,11 +37,6 @@
             vm.ricettaHandle.Carica = Carica;
             $log.log(vm.ricettaHandle);
 
-            for (var m in vm.mesi) {
-                var index = vm.ricetta['periodo'].indexOf(vm.mesi[m]);
-                vm.mesiSelezionati[vm.mesi[m]] = index > -1;
-            }
-            $log.log(vm.mesiSelezionati);
             vm.categorie = vm.ricetta['categorie'].join();
             
             if (!(vm.ricetta.hasOwnProperty('portata')) || vm.ricetta.portata == '') {
@@ -54,21 +49,19 @@
             $log.log(periodo);
             if ( !(periodo in vm.periodi) )
                 periodo = 'Tutti';
-            for (var m in vm.mesi) {
-                var daAggiungere = vm.periodi[periodo].includes(vm.mesi[m]);
-                $log.log(vm.mesi[m], daAggiungere);
-                vm.mesiSelezionati[vm.mesi[m]] = daAggiungere;
-            }
+            vm.ricetta['periodo'] = vm.periodi[periodo];
         }
         
         
         function Carica() {
-            vm.ricetta['periodo'] = [];
-            for (var m in vm.mesi) {
-                if (vm.mesiSelezionati[vm.mesi[m]])
-                    vm.ricetta['periodo'].push(vm.mesi[m]);
-            }
             vm.ricetta['categorie'] = vm.categorie.split(/[,;.:]/).filter(value => value != '');
+        }
+        
+        
+        function Toggle(m) {
+            if (! (Togli(vm.ricetta['periodo'], m)) ) {
+                vm.ricetta['periodo'].push(m);
+            }
         }
         
         
@@ -83,6 +76,7 @@
         if (index > -1) {
             contenitore.splice(index, 1);
         }
+        return index > -1;
     }
     
     function Muovi(contenitore, oggetto, direzione) {

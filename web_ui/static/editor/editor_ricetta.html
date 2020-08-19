@@ -39,7 +39,8 @@
                 </span>
                 <div class="w3-row">
                     <div class="w3-col l1 m1 s2 w3-center" ng-repeat="m in editor.mesi">
-                        <input type="checkbox" class="w3-check" ng-model="editor.mesiSelezionati[m]">
+                        <input type="checkbox" class="w3-check" ng-checked="editor.ricetta['periodo'].includes(m)"
+                               ng-click="editor.Toggle(m)">
                         <label class="w3-block">{{m}}</label>
                     </div>
                 </div>

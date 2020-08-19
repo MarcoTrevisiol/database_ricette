@@ -46,6 +46,12 @@ def nuova_ricetta(*args, **kwargs):
     except KeyError:
         pass
 
+    try:
+        month_ordered = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic']
+        j_corpo['periodo'] = [m for m in month_ordered if m in j_corpo['periodo']]
+    except KeyError:
+        pass
+
     # salvo la nuova ricetta nel database
     database_filename = '../catalogo_ricette.json'
     with open(database_filename) as db_ricette:
@@ -122,6 +128,12 @@ def update_ricetta(*args, **kwargs):
     # tolgo il valore "dosi" portato dall'interfaccia angular
     try:
         del j_corpo['dosi']
+    except KeyError:
+        pass
+
+    try:
+        month_ordered = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic']
+        j_corpo['periodo'] = [m for m in month_ordered if m in j_corpo['periodo']]
     except KeyError:
         pass
 
