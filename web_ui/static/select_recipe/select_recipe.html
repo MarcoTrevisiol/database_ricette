@@ -2,17 +2,25 @@
     <h1>Seleziona la ricetta da modificare</h1>
     <table class="w3-table w3-centered">
         <tr>
-            <th>Ricetta</th>
-            <th>Modifica</th>
+            <th></th>
+            <th ng-click="vm.sortBy(vm.titoloKey)" class="w3-hover-yellow main-clickable">Ricetta</th>
+            <th ng-click="vm.sortBy(vm.portataKey)" class="w3-hover-yellow main-clickable">Portata</th>
+            <th ng-click="vm.sortBy(vm.categorieKey)" class="w3-hover-yellow main-clickable">Categorie</th>
+            <th ng-click="vm.sortBy(vm.tempoKey)" class="w3-hover-yellow main-clickable">Tempo</th>
+            <th ng-click="vm.sortBy(vm.fonteKey)" class="w3-hover-yellow main-clickable">Fonte</th>
         </tr>
-        <tr ng-repeat="t in vm.titoli">
-            <td>{{t[1]}}</td>
-            <td>
-                <a href="{{'#!/modifica_ricetta/:' + t[0]}}"
+        <tr ng-repeat="t in vm.titoli | orderBy:vm.propertyKey:vm.reverse">
+            <td class="main-minpadding">
+                <a href="{{'#!/modifica_ricetta/:' + t['id']}}"
                    class="w3-block main-clickable main-invisible-border w3-hover-yellow w3-round-large">
                     <span class="material-icons">edit</span>
                 </a>
             </td>
+            <td>{{t['titolo']}}</td>
+            <td>{{t['portata']}}</td>
+            <td>{{t['categorie'][0]}}</td>
+            <td>{{t['tempo'] | PeriodoFilter}}</td>
+            <td>{{t['fonte'] || '?'}}</td>
         </tr>
     </table>
     <label class="w3-padding w3-block">Dosi per quante persone

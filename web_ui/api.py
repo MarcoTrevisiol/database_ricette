@@ -73,7 +73,15 @@ def lista_ricette(*args, **kwargs):
     with open(database_filename) as c_file:
         catalogo = json.load(c_file)
 
-    lista_titoli = [(r.get('id', '###'), r.get('titolo', '')) for r in catalogo]
+    lista_titoli = [{
+            'id': r.get('id', '###'),
+            'titolo': r.get('titolo', ''),
+            'tempo': r.get('tempo', 'PT0M'),
+            'portata': r.get('portata', ''),
+            'categorie': r.get('categorie', []),
+            'fonte': r.get('fonte', '')
+        }
+        for r in catalogo]
     return json.dumps(lista_titoli)
 
 
