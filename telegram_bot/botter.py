@@ -25,7 +25,7 @@ spec.loader.exec_module(query_module)
 def stringify_ingrediente(ingrediente, dosi):
     valore = ingrediente.get('quantita', {}).get('valore', 0) * dosi
 
-    if valore == int(valore):
+    if valore == int(valore) or valore >= 10:
         valore = int(valore)
 
     template = "{v}{u} {nome}"
@@ -35,7 +35,7 @@ def stringify_ingrediente(ingrediente, dosi):
         else:
             template = "{u} {nome}"
     elif valore is float:
-        template = "{v:04.2f}{u} {nome}"
+        template = "{v:.2g}{u} {nome}"
 
     if ingrediente.get('annotazioni', '') != '':
         template += " ({ann})"
