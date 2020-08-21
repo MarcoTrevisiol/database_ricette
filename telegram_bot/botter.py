@@ -4,6 +4,7 @@ import configparser
 import importlib.util
 import json
 import re
+import math
 import telegram.ext as te
 import telegram as tele
 import Levenshtein
@@ -22,25 +23,29 @@ query_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(query_module)
 
 
+def stringify_quantita(valore):
+    if valore == int(valore) and valore < 10:
+        return str(int(valore))
+
+    esponente = math.floor(math.log10(valore))-1
+    valore_arrotondato = round(valore/10**esponente) * 10**esponente
+
+    if valore_arrotondato >= 10:
+        return str(valore_arrotondato)
+    return "{:.2g}".format(valore_arrotondato).replace('.', ',')
+
+
 def stringify_ingrediente(ingrediente, dosi):
     valore = ingrediente.get('quantita', {}).get('valore', 0) * dosi
 
-    if valore == int(valore) or valore >= 10:
-        valore = int(valore)
-
-    template = "{v}{u} {nome}"
     if valore in (0, 1):
-        if ingrediente.get('quantita', {}).get('unita', '') == '':
-            template = "{nome}"
-        else:
-            template = "{u} {nome}"
-    elif valore is float:
-        template = "{v:.2g}{u} {nome}"
-
+        template = "{u} {nome}"
+    else:
+        template = "{v}{u} {nome}"
     if ingrediente.get('annotazioni', '') != '':
         template += " ({ann})"
 
-    return template.format(v=valore,
+    return template.format(v=stringify_quantita(valore),
                           u=ingrediente.get('quantita', {}).get('unita', ''),
                           nome=ingrediente.get('nome', ''),
                           ann=ingrediente.get('annotazioni', ''))
