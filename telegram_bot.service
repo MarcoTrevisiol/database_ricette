@@ -1,0 +1,10 @@
+[Unit]
+Description=Telegram Bot "Ricette Personali"
+After=network.target
+
+[Service]
+User=lotb
+ExecStart=/usr/bin/python3 /var/local/database_ricette/telegram_bot/botter.py
+
+[Install]
+WantedBy=multi-user.target
