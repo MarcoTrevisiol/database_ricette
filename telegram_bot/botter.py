@@ -301,7 +301,7 @@ def portate_callback(update, context):
 
     try:
         set_portate.remove('')
-    except KeyError:
+    except (KeyError, ValueError):
         pass
 
     keyboard_lista = [[tele.InlineKeyboardButton(por, callback_data=json.dumps({'portata': por, 'S': True}))]
@@ -317,7 +317,7 @@ def keyboard_portata_callback(update, context, data):
     categorie = query_module.query_categorie(with_portata=data['portata'])
     try:
         categorie.remove('')
-    except KeyError:
+    except (KeyError, ValueError):
         pass
 
     keyboard_lista = [[tele.InlineKeyboardButton(cat, callback_data=
