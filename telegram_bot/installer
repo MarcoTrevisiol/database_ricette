@@ -1,0 +1,15 @@
+#!/bin/sh
+
+install_dir="/var/local"
+bot_dir="${install_dir}/database_ricette/telegram_bot"
+service_unit="RicettePersonaliBot.service"
+
+
+pip3 install isodate python-Levenshtein python-telegram-bot
+
+adduser --system lotb
+chown -R lotb:staff "${bot_dir}"
+ln -s "${bot_dir}/${service_unit}" "/etc/systemd/system/${service_unit}"
+systemctl daemon-reload
+systemctl --now enable "${service_unit}"
+

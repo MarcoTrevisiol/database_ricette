@@ -4,7 +4,8 @@ After=network.target
 
 [Service]
 User=lotb
-ExecStart=/usr/bin/python3 /var/local/database_ricette/telegram_bot/botter.py
+WorkingDirectory=/var/local/database_ricette/telegram_bot/
+ExecStart=/usr/bin/python3 botter.py
 
 [Install]
 WantedBy=multi-user.target
