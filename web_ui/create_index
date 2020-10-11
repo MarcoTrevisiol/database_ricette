@@ -23,7 +23,11 @@ function scrivi () {
 } >"${index}"
 
 
+[[ $1 =~ -i ]] &&
 inotifywait -m -r -e move,create,delete --format '%f' "static/" | while read file_name
 do
 	[[ ${file_name} =~ .*js ]] && scrivi >"${index}"
 done
+
+[[ $1 =~ -s ]] && scrivi
+

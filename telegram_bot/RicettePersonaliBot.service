@@ -1,6 +1,7 @@
 [Unit]
 Description=Telegram Bot "Ricette Personali"
-After=network.target
+Wants=network-online.target
+After=network.target network-online.target
 
 [Service]
 User=lotb
