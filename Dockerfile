@@ -1,6 +1,6 @@
-FROM python:3
+FROM python:slim
 
-RUN apt-get update && apt-get install -y locales iputils-ping && \
+RUN apt-get update && apt-get install -y gcc locales && \
 	sed -i -e 's/# it_IT.UTF-8 UTF-8/it_IT.UTF-8 UTF-8/' /etc/locale.gen && \
 	dpkg-reconfigure --frontend=noninteractive locales
 
