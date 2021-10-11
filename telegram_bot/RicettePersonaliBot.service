@@ -4,6 +4,8 @@ Wants=network-online.target
 After=network.target network-online.target
 
 [Service]
+Restart=on-failure
+RestartSec=5s
 User=lotb
 WorkingDirectory=/var/local/database_ricette/telegram_bot/
 ExecStart=/usr/bin/python3 botter.py
