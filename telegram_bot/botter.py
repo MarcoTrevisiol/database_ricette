@@ -12,7 +12,6 @@ import Levenshtein
 conf_filename = "coordinates"
 configuration = configparser.ConfigParser()
 configuration.read(conf_filename)
-soglia_tolleranza = 2
 
 logging.config.fileConfig(configuration['filenames']['logconf'])
 
@@ -69,7 +68,8 @@ def stringify_variante(variante, dosi):
 
 
 def stringify_parte(parte, dosi, con_nome=False):
-    text_ingredienti = "<i>Ingredienti:</i>\n{}\n".format(stringify_ingredienti(parte.get('ingredienti', []), dosi))
+    text_ingredienti = "<i>Ingredienti:</i>\n{}\n".format(stringify_ingredienti(
+        parte.get('ingredienti', []), dosi))
     if len(parte.get('procedura', '')) > 0:
         text_procedura = "<i>Procedura:</i>\n{}\n".format(parte.get('procedura'))
     else:
@@ -78,7 +78,7 @@ def stringify_parte(parte, dosi, con_nome=False):
 
     if con_nome:
         return "<b>per {}</b>:\n{}{}\n{}".format(parte.get('nome', 'questa parte'),
-                                              text_ingredienti, text_procedura, text_varianti)
+                                                 text_ingredienti, text_procedura, text_varianti)
     else:
         return "{}{}\n{}".format(text_ingredienti, text_procedura, text_varianti)
 
@@ -107,7 +107,8 @@ def stringify_ricetta(ricetta, dosi=1):
 def get_close_match(token, dictionary):
     termine = min(dictionary, key=lambda x: Levenshtein.distance(x.lower(), token.lower()))
     distance = Levenshtein.distance(termine.lower(), token.lower())
-    logging.debug("{} è la migliore approssimazione di {}, dista {}".format(termine, token, distance))
+    logging.debug("{} è la migliore approssimazione di {}, dista {}"
+                  .format(termine, token, distance))
     return distance
 
 
@@ -119,7 +120,7 @@ def detect_query_type(token):
     ]
     for ch in checks:
         distance = get_close_match(token, ch[1])
-        if distance < soglia_tolleranza:
+        if distance < int(configuration['default']['soglia']):
             return ch[0]
 
     match = re.search(r"^[0-9]+\s*[dgho'm]", token)
@@ -134,7 +135,7 @@ def build_query_kwargs(tokens):
     query_kwargs = {}
     for token in tokens:
         token = token.strip()
-        if Levenshtein.distance(token, 'tutti') < soglia_tolleranza:
+        if Levenshtein.distance(token, 'tutti') < int(configuration['default']['soglia']):
             return {}
 
         query_type = detect_query_type(token)
@@ -190,19 +191,22 @@ def id_callback(update, context):
     logging.info("id with update={}".format(logg_stringify_update(update)))
 
     if len(id_queried) < 5:
-        context.bot.send_message(chat_id=update.effective_chat.id, text="Id non inserito!")
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text="Id non inserito!")
         return
 
     recipe = query_module.query_by_id(id_queried)
     if recipe is None:
-        context.bot.send_message(chat_id=update.effective_chat.id, text="Id inesistente!")
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text="Id inesistente!")
         return
 
     dosi = context.chat_data.get('dosi', 0)
     if dosi == 0:
         context.chat_data['dosi'] = 4
         dosi = 4
-    context.bot.send_message(chat_id=update.effective_chat.id, text=stringify_ricetta(recipe, dosi=dosi))
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text=stringify_ricetta(recipe, dosi=dosi))
 
 
 def dosi_callback(update, context):
@@ -247,7 +251,8 @@ def query_callback(update, context):
     if len(lista_ricette) == 0:
         logging.info("ricerca vuota: {}".format(query_kwargs))
 
-    text_message = query_answer(lista_ricette, stagionalita=context.chat_data.get('stagione', True))
+    text_message = query_answer(lista_ricette,
+                                stagionalita=context.chat_data.get('stagione', True))
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
 
 
@@ -275,7 +280,8 @@ def categorie_callback(update, context):
     text_message = "<i>Ecco le categorie che ho trovato:</i>"
     reply_markup = tele.InlineKeyboardMarkup(keyboard_lista)
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text_message, reply_markup=reply_markup)
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text=text_message, reply_markup=reply_markup)
 
 
 def categorie_button_callback(update, context):
@@ -289,7 +295,8 @@ def categorie_button_callback(update, context):
     if len(lista_ricette) == 0:
         logging.warning("ricerca vuota in risposta a /categorie ({})".format(query_kwargs))
 
-    text_message = query_answer(lista_ricette, stagionalita=context.chat_data.get('stagione', True))
+    text_message = query_answer(lista_ricette,
+                                stagionalita=context.chat_data.get('stagione', True))
     # CallbackQueries need to be answered, even if no notification to the user is needed
     query.answer()
     query.edit_message_text(text=text_message)
@@ -304,13 +311,16 @@ def portate_callback(update, context):
     except (KeyError, ValueError):
         pass
 
-    keyboard_lista = [[tele.InlineKeyboardButton(por, callback_data=json.dumps({'portata': por, 'S': True}))]
+    keyboard_lista = [[tele.InlineKeyboardButton(por, callback_data=json.dumps(
+                                                    {'portata': por, 'S': True}
+                                                ))]
                       for por in sorted((list(set_portate)))]
 
     text_message = "<i>Ecco le portate che ho trovato:</i>"
     reply_markup = tele.InlineKeyboardMarkup(keyboard_lista)
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text_message, reply_markup=reply_markup)
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text=text_message, reply_markup=reply_markup)
 
 
 def keyboard_portata_callback(update, context, data):
@@ -350,7 +360,8 @@ def portate_button_callback(update, context):
     if len(lista_ricette) == 0:
         logging.info("ricerca vuota in risposta a /categorie ({})".format(data))
 
-    text_message = query_answer(lista_ricette, stagionalita=context.chat_data.get('stagione', True))
+    text_message = query_answer(lista_ricette,
+                                stagionalita=context.chat_data.get('stagione', True))
     # CallbackQueries need to be answered, even if no notification to the user is needed
     query.answer()
     query.edit_message_text(text=text_message)
@@ -366,7 +377,8 @@ def main_bot():
     defaults = te.Defaults(parse_mode=tele.ParseMode.HTML)
     with open(configuration["filenames"]["token"]) as token_file:
         token = token_file.read().strip()
-    updater = te.Updater(token=token, use_context=True, persistence=persistence, defaults=defaults)
+    updater = te.Updater(token=token, use_context=True,
+                         persistence=persistence, defaults=defaults)
 
     dispatcher = updater.dispatcher
     dispatcher.add_handler(te.CommandHandler("start", start_callback))

@@ -7,6 +7,11 @@ contacturl=http://t.me/RicettePersonaliBot
 logconf=logger.ini
 token=token
 persistence=persistence.pickle
+database=../catalogo_ricette.json
 
 [help]
 message=<i>Sono il tuo assistente culinaro:  Fornisco ricette</i>\nper trovare le ricette puoi scrivermi gli ingredienti principali che hai a disposizione (separati da ",") oppure puoi scrivermi il tempo che hai a disposizione\n\nEcco cosa puoi fare con i comandi:\n/portate permette di navigare fra le portate e categorie disponibili\n/dosi permette di visualizzare e modificare il dosaggio di default\n/stagione permette di cambiare modalità di ricerca (solo ricette di stagione vs. tutte)
+
+[default]
+soglia=2
+dosi=4

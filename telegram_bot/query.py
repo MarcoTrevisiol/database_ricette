@@ -1,3 +1,4 @@
+import configparser
 import json
 import re
 import datetime
@@ -5,9 +6,12 @@ import isodate
 import locale
 import Levenshtein
 
+conf_filename = "coordinates"
+configuration = configparser.ConfigParser()
+configuration.read(conf_filename)
+
 locale.setlocale(locale.LC_TIME, "it_IT.utf8")
-catalogo_file = '../catalogo_ricette.json'
-soglia = 2
+catalogo_file = configuration['filenames']['database']
 
 
 def query_globali(chiave='titolo'):
@@ -51,14 +55,14 @@ def query_ingredienti(solo_principali=True, chiave='nome'):
 
 
 def equal_enough(left_term, right_term):
-    return Levenshtein.distance(left_term, right_term) < soglia
+    return Levenshtein.distance(left_term, right_term) < int(configuration['default']['soglia'])
 
 
 def belong_enough(term, dictionary):
     if len(dictionary) == 0:
         return False
     termine = min(dictionary, key=lambda x: Levenshtein.distance(term, x))
-    return Levenshtein.distance(term, termine) < soglia
+    return Levenshtein.distance(term, termine) < int(configuration['default']['soglia'])
 
 
 def compute_duration(token):
@@ -85,7 +89,8 @@ def query_ricette(**kwargs):
             if not equal_enough(kwargs['portata'].lower(), r.get('portata', '').lower()):
                 return False
         if 'categoria' in kwargs.keys():
-            if not belong_enough(kwargs['categoria'].lower(), [cat.lower() for cat in r.get('categorie', [])]):
+            if not belong_enough(kwargs['categoria'].lower(),
+                                 [cat.lower() for cat in r.get('categorie', [])]):
                 return False
         if 'titolo' in kwargs.keys():
             if not kwargs['titolo'].lower() in r.get('titolo').lower():
