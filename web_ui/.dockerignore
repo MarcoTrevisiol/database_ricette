@@ -10,7 +10,8 @@ Makefile
 Dockerfile
 create_index
 index_model.html
-test.py
+cgi-bin/test.py
 database
 .dockerignore
-**/*.js
+*/*.js
+*/*/*.js
