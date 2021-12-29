@@ -34,10 +34,10 @@
         
         function GetPortate() {
             return {
-                'Primo': 'resources/Primo.jpg',
-                'Secondo': 'resources/Secondo.jpg',
-                'Contorno': 'resources/Contorno.jpg',
-                'Dolce': 'resources/Dolce.jpg',
+                'Primo': 'resources/primo.jpg',
+                'Secondo': 'resources/secondo.jpg',
+                'Contorno': 'resources/contorno.jpg',
+                'Dolce': 'resources/dolce.jpg',
             };
         }
         
