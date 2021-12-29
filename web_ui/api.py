@@ -1,7 +1,8 @@
-import os
 import json
 import string
 import random
+
+database_filename = 'database'
 
 
 def errore(*args, **kwargs):
@@ -53,7 +54,6 @@ def nuova_ricetta(*args, **kwargs):
         pass
 
     # salvo la nuova ricetta nel database
-    database_filename = '../catalogo_ricette.json'
     with open(database_filename) as db_ricette:
         elenco_ricette = json.load(db_ricette)
     elenco_ricette.append(j_corpo)
@@ -69,7 +69,6 @@ def nuova_ricetta(*args, **kwargs):
 
 
 def lista_ricette(*args, **kwargs):
-    database_filename = '../catalogo_ricette.json'
     with open(database_filename) as c_file:
         catalogo = json.load(c_file)
 
@@ -86,7 +85,6 @@ def lista_ricette(*args, **kwargs):
 
 
 def ottieni_ricetta(*args, **kwargs):
-    database_filename = '../catalogo_ricette.json'
     with open(database_filename) as c_file:
         catalogo = json.load(c_file)
 
@@ -146,7 +144,6 @@ def update_ricetta(*args, **kwargs):
         pass
 
     # rimpiazzo la ricetta
-    database_filename = '../catalogo_ricette.json'
     with open(database_filename) as db_ricette:
         elenco_ricette = json.load(db_ricette)
     index_to_replace = next(i for i, v in enumerate(elenco_ricette) if v['id'] == id)
@@ -162,7 +159,6 @@ def update_ricetta(*args, **kwargs):
 
 
 def lista_ingredienti(*args, **kwargs):
-    database_filename = '../catalogo_ricette.json'
     with open(database_filename) as c_file:
         catalogo = json.load(c_file)
 
