@@ -1,0 +1,16 @@
+**/*~
+**/.*~
+**/*.pickle
+**/*.log
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+Makefile
+Dockerfile
+create_index
+index_model.html
+test.py
+database
+.dockerignore
+**/*.js
