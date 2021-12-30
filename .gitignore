@@ -10,4 +10,5 @@ telegram_bot/*pickle
 telegram_bot/env
 web_ui/index.html
 web_ui/main.js
+docker_image*.tar
 
