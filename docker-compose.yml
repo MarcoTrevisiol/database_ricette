@@ -6,7 +6,7 @@ services:
       - persistence:/var/local/persistence
       - ${CATALOGO_PATH}:/var/local/database:ro
     env_file:
-      - telegram_bot/env
+      - ${BOT_ENV}
   sito_ricette:
     image: sito_ricette:latest
     volumes:
