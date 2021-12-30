@@ -5,6 +5,7 @@ import importlib.util
 import json
 import re
 import math
+import os
 import telegram.ext as te
 import telegram as tele
 import Levenshtein
@@ -372,11 +373,21 @@ def error_callback(update, context):
     logging.warning('Update "{}" Error "{}"'.format(update, context.error))
 
 
+def get_secret_token():
+    try:
+        with open(configuration["filenames"]["token"]) as token_file:
+            token = token_file.read().strip()
+    except FileNotFoundError:
+        token = os.getenv('TOKEN')
+    if not token:
+        raise TypeError("Secret Telegram Token not found!")
+    return token
+
+
 def main_bot():
     persistence = te.PicklePersistence(filename=configuration["filenames"]["persistence"])
     defaults = te.Defaults(parse_mode=tele.ParseMode.HTML)
-    with open(configuration["filenames"]["token"]) as token_file:
-        token = token_file.read().strip()
+    token = get_secret_token()
     updater = te.Updater(token=token, use_context=True,
                          persistence=persistence, defaults=defaults)
 

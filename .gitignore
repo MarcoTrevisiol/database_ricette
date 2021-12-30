@@ -7,5 +7,7 @@ __pycache__
 telegram_bot/token
 telegram_bot/*log
 telegram_bot/*pickle
+telegram_bot/env
 web_ui/index.html
 web_ui/main.js
+

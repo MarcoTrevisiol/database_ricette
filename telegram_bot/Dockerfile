@@ -6,10 +6,10 @@ RUN apt-get update && apt-get install -y gcc locales && \
 
 WORKDIR /usr/local/telegram_bot
 
-COPY telegram_bot/requirements.txt ./
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY telegram_bot/ .
+COPY . ./
 ENV PERSISTENCE=/var/local/persistence
 ENV DATABASE=/var/local/database
 RUN sed -i -e "s|persistence=.*$|persistence=${PERSISTENCE}/persistence.pickle|" coordinates && \

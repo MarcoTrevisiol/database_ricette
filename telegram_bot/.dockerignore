@@ -1,0 +1,15 @@
+*~
+.*~
+*.pickle
+*.log
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+Dockerfile
+.dockerignore
+token
+env
+RicettePersonaliBot.service
+configurazione_bot_father
+installer
