@@ -5,14 +5,15 @@ services:
     volumes:
       - persistence:/var/local/persistence
       - ${CATALOGO_PATH}:/var/local/database:ro
-    env_file:
-      - ${BOT_ENV}
+    environment:
+      - TOKEN
   sito_ricette:
     image: web_ui:arm
     volumes:
       - ${CATALOGO_PATH}:/var/local/database
+      - ${WWW_PATH}:/var/www
     ports:
-      - 80:80
+      - 8:80
   backup:
     image: backup_catalogo:arm
     volumes:
