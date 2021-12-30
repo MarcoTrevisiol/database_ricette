@@ -2,7 +2,6 @@ target=
 platform=linux/arm/v7
 tag=:arm
 IMAGES=telegram_bot web_ui backup_catalogo
-TAR_IMAGES=$(patsubst %, %.tar, $(IMAGES))
 DOCKER_IMAGES=$(patsubst %, docker_image_%.tar, $(IMAGES))
 
 all_docker: $(DOCKER_IMAGES)
@@ -16,4 +15,7 @@ web_ui_preparation:
 	cd web_ui && make clean && make
 
 remote_prepare: $(DOCKER_IMAGES)
-	rsync -av docker_preparation.sh docker-compose.yml $^ ${target}
+	rsync -avP docker_preparation.sh docker-compose.yml $^ ${target}
+
+clean:
+	-rm $(DOCKER_IMAGES)

@@ -1,20 +1,20 @@
 version: "3.8"
 services:
   ricette_personali_bot:
-    image: ricette_personali_bot:latest
+    image: telegram_bot:arm
     volumes:
       - persistence:/var/local/persistence
       - ${CATALOGO_PATH}:/var/local/database:ro
     env_file:
       - ${BOT_ENV}
   sito_ricette:
-    image: sito_ricette:latest
+    image: web_ui:arm
     volumes:
       - ${CATALOGO_PATH}:/var/local/database
     ports:
       - 80:80
   backup:
-    image: backup_ricette:latest
+    image: backup_catalogo:arm
     volumes:
       - ${CATALOGO_PATH}:/var/local/database
 

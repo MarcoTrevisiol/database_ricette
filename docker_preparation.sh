@@ -11,5 +11,8 @@ chmod a+w "${CATALOGO_PATH}/catalogo_ricette.json"
 printf "https://MarcoTrevisiol:${github}@github.com\n" >"${CATALOGO_PATH}/.git/cre"
 printf "TOKEN=${telegram}\n" >"${BOT_ENV}"
 printf "CATALOGO_PATH=${PWD}/${CATALOGO_PATH}\nBOT_ENV=${BOT_ENV}\n" >.env
-
+for docker_image in docker_image*.tar
+do
+  docker image import "${docker_image}"
+done
 
