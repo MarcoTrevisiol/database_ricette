@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  ricette_personali_bot:
+    image: ricette_personali_bot:latest
+    volumes:
+      - persistence:/var/local/persistence
+      - ${CATALOGO_PATH}:/var/local/database:ro
+    env_file:
+      - telegram_bot/env
+  sito_ricette:
+    image: sito_ricette:latest
+    volumes:
+      - ${CATALOGO_PATH}:/var/local/database
+    ports:
+      - 80:80
+  backup:
+    image: backup_ricette:latest
+    volumes:
+      - ${CATALOGO_PATH}:/var/local/database
+
+volumes:
+  persistence:
