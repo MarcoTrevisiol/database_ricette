@@ -10,6 +10,6 @@ git --git-dir="${CATALOGO_PATH}/.git" config credential.helper 'store --file=.gi
 chmod a+w "${CATALOGO_PATH}/catalogo_ricette.json"
 printf "https://MarcoTrevisiol:${github}@github.com\n" >"${CATALOGO_PATH}/.git/cre"
 printf "TOKEN=${telegram}\n" >"${BOT_ENV}"
-printf "CATALOGO_PATH=${CATALOGO_PATH}\nBOT_ENV=${BOT_ENV}\n" >.env
+printf "CATALOGO_PATH=${PWD}/${CATALOGO_PATH}\nBOT_ENV=${BOT_ENV}\n" >.env
 
 
