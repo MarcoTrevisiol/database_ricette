@@ -13,7 +13,7 @@ services:
       - ${CATALOGO_PATH}:/var/local/database
       - ${WWW_PATH}:/var/www
     ports:
-      - 8:80
+      - 80:80
   backup:
     image: backup_catalogo:arm
     volumes:
