@@ -5,12 +5,12 @@ import logging.config
 import os
 import re
 
-import Levenshtein
 import telegram as tele
 import telegram.ext as te
 
 import stringify
 import query as query_module
+import levenshtein
 
 conf_filename = "coordinates"
 configuration = configparser.ConfigParser()
@@ -20,8 +20,8 @@ logging.config.fileConfig(configuration['filenames']['logconf'])
 
 
 def get_close_match(token, dictionary):
-    termine = min(dictionary, key=lambda x: Levenshtein.distance(x.lower(), token.lower()))
-    distance = Levenshtein.distance(termine.lower(), token.lower())
+    termine = min(dictionary, key=lambda x: levenshtein.distance(x.lower(), token.lower()))
+    distance = levenshtein.distance(termine.lower(), token.lower())
     logging.debug("{} è la migliore approssimazione di {}, dista {}"
                   .format(termine, token, distance))
     return distance
@@ -50,7 +50,7 @@ def build_query_kwargs(tokens):
     query_kwargs = {}
     for token in tokens:
         token = token.strip()
-        if Levenshtein.distance(token, 'tutti') < int(configuration['default']['soglia']):
+        if levenshtein.distance(token, 'tutti') < int(configuration['default']['soglia']):
             return {}
 
         query_type = detect_query_type(token)

@@ -4,7 +4,8 @@ import re
 import datetime
 import isodate
 import locale
-import Levenshtein
+
+import levenshtein
 
 conf_filename = "coordinates"
 configuration = configparser.ConfigParser()
@@ -55,14 +56,14 @@ def query_ingredienti(solo_principali=True, chiave='nome'):
 
 
 def equal_enough(left_term, right_term):
-    return Levenshtein.distance(left_term, right_term) < int(configuration['default']['soglia'])
+    return levenshtein.distance(left_term, right_term) < int(configuration['default']['soglia'])
 
 
 def belong_enough(term, dictionary):
     if len(dictionary) == 0:
         return False
-    termine = min(dictionary, key=lambda x: Levenshtein.distance(term, x))
-    return Levenshtein.distance(term, termine) < int(configuration['default']['soglia'])
+    termine = min(dictionary, key=lambda x: levenshtein.distance(term, x))
+    return levenshtein.distance(term, termine) < int(configuration['default']['soglia'])
 
 
 def compute_duration(token):
