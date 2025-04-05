@@ -2,10 +2,10 @@ import configparser
 import json
 import re
 import datetime
-import isodate
 import locale
 
 import levenshtein
+import isodelta
 
 conf_filename = "coordinates"
 configuration = configparser.ConfigParser()
@@ -105,12 +105,12 @@ def query_ricette(**kwargs):
                 return False
         if 'tempo' in kwargs.keys():
             if not datetime.timedelta(minutes=compute_duration(kwargs['tempo'])) >=\
-                   isodate.parse_duration(r.get('tempo', 'PT0M')):
+                   isodelta.parse_duration(r.get('tempo', 'PT0M')):
                 return False
         return True
 
     def stringify_duration(iso):
-        duration = isodate.parse_duration(iso)
+        duration = isodelta.parse_duration(iso)
         humanized = ''
         if duration.days > 0:
             humanized += '{}d'.format(duration.days)
