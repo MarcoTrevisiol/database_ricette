@@ -27,8 +27,8 @@ def stringify_quantita(valore):
     if valore == int(valore) and valore < 10:
         return str(int(valore))
 
-    esponente = math.floor(math.log10(valore))-1
-    valore_arrotondato = round(valore/10**esponente) * 10**esponente
+    esponente = math.floor(math.log10(valore)) - 1
+    valore_arrotondato = round(valore / 10 ** esponente) * 10 ** esponente
 
     if valore_arrotondato >= 10:
         return str(valore_arrotondato)
@@ -46,9 +46,9 @@ def stringify_ingrediente(ingrediente, dosi):
         template += " ({ann})"
 
     return template.format(v=stringify_quantita(valore),
-                          u=ingrediente.get('quantita', {}).get('unita', ''),
-                          nome=ingrediente.get('nome', ''),
-                          ann=ingrediente.get('annotazioni', ''))
+                           u=ingrediente.get('quantita', {}).get('unita', ''),
+                           nome=ingrediente.get('nome', ''),
+                           ann=ingrediente.get('annotazioni', ''))
 
 
 def stringify_ingredienti(lista, dosi):
@@ -175,18 +175,18 @@ def logg_stringify_update(update):
     return segno
 
 
-def start_callback(update, context):
+async def start_callback(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="<i>Fornisco ricette</i>")
     logging.info("start with update={}".format(logg_stringify_update(update)))
 
 
-def help_callback(update, context):
+async def help_callback(update, context):
     text_help = configuration['help']['message'].replace('\\n', '\n')
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_help)
     logging.info("help with update={}".format(logg_stringify_update(update)))
 
 
-def id_callback(update, context):
+async def id_callback(update, context):
     command = update.effective_message.text.split(' ')[0]
     id_queried = command[3:]
     logging.info("id with update={}".format(logg_stringify_update(update)))
@@ -210,7 +210,7 @@ def id_callback(update, context):
                              text=stringify_ricetta(recipe, dosi=dosi))
 
 
-def dosi_callback(update, context):
+async def dosi_callback(update, context):
     logging.info("dosi with update={}".format(logg_stringify_update(update)))
     if len(context.args) < 1:
         dosi = context.chat_data.get('dosi', 0)
@@ -231,7 +231,7 @@ def dosi_callback(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
 
 
-def stagione_callback(update, context):
+async def stagione_callback(update, context):
     logging.info("stagione with update={}".format(logg_stringify_update(update)))
     stagionalita_attuale = context.chat_data.get('stagione', True)
     context.chat_data['stagione'] = not stagionalita_attuale
@@ -242,7 +242,7 @@ def stagione_callback(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
 
 
-def query_callback(update, context):
+async def query_callback(update, context):
     logging.info("query with update={}".format(logg_stringify_update(update)))
     query_kwargs = build_query_kwargs(update.effective_message.text.split(','))
     if not context.chat_data.get('stagione', True):
@@ -257,7 +257,7 @@ def query_callback(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
 
 
-def categorie_callback(update, context):
+async def categorie_callback(update, context):
     logging.info("categorie with update={}".format(logg_stringify_update(update)))
     set_portate = query_module.query_globali(chiave='portata')
     categorie = query_module.query_categorie() | set_portate
@@ -285,7 +285,7 @@ def categorie_callback(update, context):
                              text=text_message, reply_markup=reply_markup)
 
 
-def categorie_button_callback(update, context):
+async def categorie_button_callback(update, context):
     query = update.callback_query
     data = json.loads(query.data)
     query_kwargs = {data['type']: data['value']}
@@ -303,7 +303,7 @@ def categorie_button_callback(update, context):
     query.edit_message_text(text=text_message)
 
 
-def portate_callback(update, context):
+async def portate_callback(update, context):
     logging.info("portate with update={}".format(logg_stringify_update(update)))
     set_portate = sorted(list(query_module.query_globali(chiave='portata')))
 
@@ -312,9 +312,7 @@ def portate_callback(update, context):
     except (KeyError, ValueError):
         pass
 
-    keyboard_lista = [[tele.InlineKeyboardButton(por, callback_data=json.dumps(
-                                                    {'portata': por, 'S': True}
-                                                ))]
+    keyboard_lista = [[tele.InlineKeyboardButton(por, callback_data=json.dumps({'portata': por, 'S': True}))]
                       for por in sorted((list(set_portate)))]
 
     text_message = "<i>Ecco le portate che ho trovato:</i>"
@@ -324,7 +322,7 @@ def portate_callback(update, context):
                              text=text_message, reply_markup=reply_markup)
 
 
-def keyboard_portata_callback(update, context, data):
+async def keyboard_portata_callback(update, context, data):
     categorie = query_module.query_categorie(with_portata=data['portata'])
     try:
         categorie.remove('')
@@ -332,10 +330,10 @@ def keyboard_portata_callback(update, context, data):
         pass
 
     keyboard_lista = [[tele.InlineKeyboardButton(cat, callback_data=
-                       json.dumps({'portata': data['portata'], 'categoria': cat, 'S': False}))]
+    json.dumps({'portata': data['portata'], 'categoria': cat, 'S': False}))]
                       for cat in sorted(list(categorie))]
     keyboard_lista.append([tele.InlineKeyboardButton('Tutte', callback_data=
-                       json.dumps({'portata': data['portata'], 'S': False}))])
+    json.dumps({'portata': data['portata'], 'S': False}))])
 
     text_message = "<i>Ecco le categorie che ho trovato:</i>"
     reply_markup = tele.InlineKeyboardMarkup(keyboard_lista)
@@ -344,7 +342,7 @@ def keyboard_portata_callback(update, context, data):
     update.callback_query.edit_message_text(text=text_message, reply_markup=reply_markup)
 
 
-def portate_button_callback(update, context):
+async def portate_button_callback(update, context):
     logging.info("portate button with update={}".format(logg_stringify_update(update)))
     query = update.callback_query
     data = json.loads(query.data)
@@ -368,7 +366,7 @@ def portate_button_callback(update, context):
     query.edit_message_text(text=text_message)
 
 
-def error_callback(update, context):
+async def error_callback(update, context):
     """Log Errors caused by Updates."""
     logging.warning('Update "{}" Error "{}"'.format(update, context.error))
 
@@ -385,27 +383,29 @@ def get_secret_token():
 
 
 def main_bot():
-    persistence = te.PicklePersistence(filename=configuration["filenames"]["persistence"])
-    defaults = te.Defaults(parse_mode=tele.ParseMode.HTML)
+    persistence = te.PicklePersistence(filepath=configuration["filenames"]["persistence"])
+    defaults = te.Defaults(parse_mode=tele.constants.ParseMode.HTML)
     token = get_secret_token()
-    updater = te.Updater(token=token, use_context=True,
-                         persistence=persistence, defaults=defaults)
+    application = (te.Application.builder()
+                   .token(token)
+                   .defaults(defaults)
+                   .persistence(persistence)
+                   .context_types(te.ContextTypes())
+                   .build())
 
-    dispatcher = updater.dispatcher
-    dispatcher.add_handler(te.CommandHandler("start", start_callback))
-    dispatcher.add_handler(te.CommandHandler("help", help_callback))
-    dispatcher.add_handler(te.CommandHandler("aiuto", help_callback))
-    dispatcher.add_handler(te.MessageHandler(te.Filters.regex(r'^/id'), id_callback))
-    dispatcher.add_handler(te.CommandHandler("dosi", dosi_callback))
-    dispatcher.add_handler(te.CommandHandler("stagione", stagione_callback))
-    dispatcher.add_handler(te.CommandHandler("categorie", categorie_callback))
-    dispatcher.add_handler(te.CommandHandler("portate", portate_callback))
-    dispatcher.add_handler(te.CallbackQueryHandler(portate_button_callback))
-    dispatcher.add_handler(te.MessageHandler(te.Filters.text, query_callback))
-    dispatcher.add_error_handler(error_callback)
+    application.add_handler(te.CommandHandler("start", start_callback))
+    application.add_handler(te.CommandHandler("help", help_callback))
+    application.add_handler(te.CommandHandler("aiuto", help_callback))
+    application.add_handler(te.MessageHandler(te.filters.Regex(r'^/id'), id_callback))
+    application.add_handler(te.CommandHandler("dosi", dosi_callback))
+    application.add_handler(te.CommandHandler("stagione", stagione_callback))
+    application.add_handler(te.CommandHandler("categorie", categorie_callback))
+    application.add_handler(te.CommandHandler("portate", portate_callback))
+    application.add_handler(te.CallbackQueryHandler(portate_button_callback))
+    application.add_handler(te.MessageHandler(te.filters.Text(), query_callback))
+    application.add_error_handler(error_callback)
 
-    updater.start_polling()
-    updater.idle()
+    application.run_polling(allowed_updates=tele.Update.ALL_TYPES)
 
 
 main_bot()
