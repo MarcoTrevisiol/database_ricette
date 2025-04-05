@@ -1,7 +1,7 @@
 target=
 platform=linux/arm/v7
 tag=:arm
-IMAGES=telegram_bot web_ui backup_catalogo
+IMAGES=telegram_bot web_ui
 DOCKER_IMAGES=$(patsubst %, docker_image_%.tar, $(IMAGES))
 
 all_docker: $(DOCKER_IMAGES)

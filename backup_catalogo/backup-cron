@@ -1,2 +1,0 @@
-43 23 * * * /usr/local/bin/backup.sh >> /var/log/cron.log 2>&1
-
