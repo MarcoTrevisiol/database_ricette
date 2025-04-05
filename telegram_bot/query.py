@@ -3,6 +3,7 @@ import json
 import re
 import datetime
 import locale
+import logging
 
 import levenshtein
 import isodelta
@@ -137,3 +138,56 @@ def query_by_id(id_ricetta):
         raise KeyError('Id collision on {}'.format(catalogo_file))
 
     return next(iter(ricetta), None)
+
+
+def get_close_match(token, dictionary):
+    termine = min(dictionary, key=lambda x: levenshtein.distance(x.lower(), token.lower()))
+    distance = levenshtein.distance(termine.lower(), token.lower())
+    logging.debug("{} è la migliore approssimazione di {}, dista {}"
+                  .format(termine, token, distance))
+    return distance
+
+
+def detect_query_type(token):
+    checks = [
+        ('portata', query_globali(chiave='portata')),
+        ('categoria', query_categorie()),
+        ('ingrediente', query_ingredienti()),
+    ]
+    for ch in checks:
+        distance = get_close_match(token, ch[1])
+        if distance < int(configuration['default']['soglia']):
+            return ch[0]
+
+    match = re.search(r"^[0-9]+\s*[dgho'm]", token)
+    if match is not None:
+        return 'tempo'
+    if token is not None:
+        return 'titolo'
+    raise KeyError
+
+
+def build_query_kwargs(tokens):
+    query_kwargs = {}
+    for token in tokens:
+        token = token.strip()
+        if levenshtein.distance(token, 'tutti') < int(configuration['default']['soglia']):
+            return {}
+
+        query_type = detect_query_type(token)
+        query_kwargs[query_type] = token
+        logging.info("token \"{}\" interpretato come {}".format(token, query_type))
+    return query_kwargs
+
+
+def query_answer(lista_ricette, stagionalita=True):
+    if len(lista_ricette) == 0:
+        if stagionalita:
+            text_message = "Nessuna ricetta di stagione soddisfa i parametri di ricerca inseriti."
+        else:
+            text_message = "Nessuna ricetta soddisfa i parametri di ricerca inseriti."
+    else:
+        text_lista = '\n'.join(["{1} ({2}) /id{0}".format(*r_pair)
+                                for r_pair in sorted(lista_ricette, key=lambda x: x[1])])
+        text_message = "Ecco le ricette che ho trovato:\n{}".format(text_lista)
+    return text_message

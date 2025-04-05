@@ -5,7 +5,7 @@ bot_dir="${install_dir}/database_ricette/telegram_bot"
 service_unit="RicettePersonaliBot.service"
 
 
-pip3 install isodate python-Levenshtein python-telegram-bot
+python3 -m pip install --no-cache-dir -r requirements.txt
 
 adduser --system lotb
 chown -R lotb:staff "${bot_dir}"

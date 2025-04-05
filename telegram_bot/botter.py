@@ -3,14 +3,12 @@ import json
 import logging
 import logging.config
 import os
-import re
 
 import telegram as tele
 import telegram.ext as te
 
 import stringify
 import query as query_module
-import levenshtein
 
 conf_filename = "coordinates"
 configuration = configparser.ConfigParser()
@@ -19,60 +17,7 @@ configuration.read(conf_filename)
 logging.config.fileConfig(configuration['filenames']['logconf'])
 
 
-def get_close_match(token, dictionary):
-    termine = min(dictionary, key=lambda x: levenshtein.distance(x.lower(), token.lower()))
-    distance = levenshtein.distance(termine.lower(), token.lower())
-    logging.debug("{} è la migliore approssimazione di {}, dista {}"
-                  .format(termine, token, distance))
-    return distance
-
-
-def detect_query_type(token):
-    checks = [
-        ('portata', query_module.query_globali(chiave='portata')),
-        ('categoria', query_module.query_categorie()),
-        ('ingrediente', query_module.query_ingredienti()),
-    ]
-    for ch in checks:
-        distance = get_close_match(token, ch[1])
-        if distance < int(configuration['default']['soglia']):
-            return ch[0]
-
-    match = re.search(r"^[0-9]+\s*[dgho'm]", token)
-    if match is not None:
-        return 'tempo'
-    if token is not None:
-        return 'titolo'
-    raise KeyError
-
-
-def build_query_kwargs(tokens):
-    query_kwargs = {}
-    for token in tokens:
-        token = token.strip()
-        if levenshtein.distance(token, 'tutti') < int(configuration['default']['soglia']):
-            return {}
-
-        query_type = detect_query_type(token)
-        query_kwargs[query_type] = token
-        logging.info("token \"{}\" interpretato come {}".format(token, query_type))
-    return query_kwargs
-
-
-def query_answer(lista_ricette, stagionalita=True):
-    if len(lista_ricette) == 0:
-        if stagionalita:
-            text_message = "Nessuna ricetta di stagione soddisfa i parametri di ricerca inseriti."
-        else:
-            text_message = "Nessuna ricetta soddisfa i parametri di ricerca inseriti."
-    else:
-        text_lista = '\n'.join(["{1} ({2}) /id{0}".format(*r_pair)
-                                for r_pair in sorted(lista_ricette, key=lambda x: x[1])])
-        text_message = "Ecco le ricette che ho trovato:\n{}".format(text_lista)
-    return text_message
-
-
-def logg_stringify_update(update):
+def log_update(template, update):
     try:
         segno = "|Chat:{}|Message:'text'='{}';'callback_query'='{}';'date'='{}'|".format(
             update.effective_chat,
@@ -86,24 +31,25 @@ def logg_stringify_update(update):
             update.effective_message.text,
             update.effective_message.date
         )
-    return segno
+
+    logging.info(template.format(segno))
 
 
 async def start_callback(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="<i>Fornisco ricette</i>")
-    logging.info("start with update={}".format(logg_stringify_update(update)))
+    log_update("start with update={}", update)
 
 
 async def help_callback(update, context):
     text_help = configuration['help']['message'].replace('\\n', '\n')
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_help)
-    logging.info("help with update={}".format(logg_stringify_update(update)))
+    log_update("help with update={}", update)
 
 
 async def id_callback(update, context):
     command = update.effective_message.text.split(' ')[0]
     id_queried = command[3:]
-    logging.info("id with update={}".format(logg_stringify_update(update)))
+    log_update("id with update={}", update)
 
     if len(id_queried) < 5:
         context.bot.send_message(chat_id=update.effective_chat.id,
@@ -125,7 +71,7 @@ async def id_callback(update, context):
 
 
 async def dosi_callback(update, context):
-    logging.info("dosi with update={}".format(logg_stringify_update(update)))
+    log_update("dosi with update={}", update)
     if len(context.args) < 1:
         dosi = context.chat_data.get('dosi', 0)
         if dosi == 0:
@@ -146,7 +92,7 @@ async def dosi_callback(update, context):
 
 
 async def stagione_callback(update, context):
-    logging.info("stagione with update={}".format(logg_stringify_update(update)))
+    log_update("stagione with update={}", update)
     stagionalita_attuale = context.chat_data.get('stagione', True)
     context.chat_data['stagione'] = not stagionalita_attuale
     if stagionalita_attuale:
@@ -157,8 +103,8 @@ async def stagione_callback(update, context):
 
 
 async def query_callback(update, context):
-    logging.info("query with update={}".format(logg_stringify_update(update)))
-    query_kwargs = build_query_kwargs(update.effective_message.text.split(','))
+    log_update("query with update={}", update)
+    query_kwargs = query_module.build_query_kwargs(update.effective_message.text.split(','))
     if not context.chat_data.get('stagione', True):
         query_kwargs['periodo'] = True
     lista_ricette = query_module.query_ricette(**query_kwargs)
@@ -166,13 +112,13 @@ async def query_callback(update, context):
     if len(lista_ricette) == 0:
         logging.info("ricerca vuota: {}".format(query_kwargs))
 
-    text_message = query_answer(lista_ricette,
-                                stagionalita=context.chat_data.get('stagione', True))
+    text_message = query_module.query_answer(lista_ricette,
+                                             stagionalita=context.chat_data.get('stagione', True))
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
 
 
 async def categorie_callback(update, context):
-    logging.info("categorie with update={}".format(logg_stringify_update(update)))
+    log_update("categorie with update={}", update)
     set_portate = query_module.query_globali(chiave='portata')
     categorie = query_module.query_categorie() | set_portate
 
@@ -210,15 +156,15 @@ async def categorie_button_callback(update, context):
     if len(lista_ricette) == 0:
         logging.warning("ricerca vuota in risposta a /categorie ({})".format(query_kwargs))
 
-    text_message = query_answer(lista_ricette,
-                                stagionalita=context.chat_data.get('stagione', True))
+    text_message = query_module.query_answer(lista_ricette,
+                                             stagionalita=context.chat_data.get('stagione', True))
     # CallbackQueries need to be answered, even if no notification to the user is needed
     query.answer()
     query.edit_message_text(text=text_message)
 
 
 async def portate_callback(update, context):
-    logging.info("portate with update={}".format(logg_stringify_update(update)))
+    log_update("portate with update={}", update)
     set_portate = sorted(list(query_module.query_globali(chiave='portata')))
 
     try:
@@ -257,7 +203,7 @@ async def keyboard_portata_callback(update, context, data):
 
 
 async def portate_button_callback(update, context):
-    logging.info("portate button with update={}".format(logg_stringify_update(update)))
+    log_update("portate button with update={}", update)
     query = update.callback_query
     data = json.loads(query.data)
     if 'S' not in data.keys():
@@ -273,8 +219,8 @@ async def portate_button_callback(update, context):
     if len(lista_ricette) == 0:
         logging.info("ricerca vuota in risposta a /categorie ({})".format(data))
 
-    text_message = query_answer(lista_ricette,
-                                stagionalita=context.chat_data.get('stagione', True))
+    text_message = query_module.query_answer(lista_ricette,
+                                             stagionalita=context.chat_data.get('stagione', True))
     # CallbackQueries need to be answered, even if no notification to the user is needed
     query.answer()
     query.edit_message_text(text=text_message)
