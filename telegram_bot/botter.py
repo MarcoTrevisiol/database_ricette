@@ -1,108 +1,22 @@
+import configparser
+import json
 import logging
 import logging.config
-import configparser
-import importlib.util
-import json
-import re
-import math
 import os
-import telegram.ext as te
-import telegram as tele
+import re
+
 import Levenshtein
+import telegram as tele
+import telegram.ext as te
+
+import stringify
+import query as query_module
 
 conf_filename = "coordinates"
 configuration = configparser.ConfigParser()
 configuration.read(conf_filename)
 
 logging.config.fileConfig(configuration['filenames']['logconf'])
-
-query_module_name = 'query_catalogo'
-query_module_filepath = 'query.py'
-spec = importlib.util.spec_from_file_location(query_module_name, query_module_filepath)
-query_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(query_module)
-
-
-def stringify_quantita(valore):
-    if valore == int(valore) and valore < 10:
-        return str(int(valore))
-
-    esponente = math.floor(math.log10(valore)) - 1
-    valore_arrotondato = round(valore / 10 ** esponente) * 10 ** esponente
-
-    if valore_arrotondato >= 10:
-        return str(valore_arrotondato)
-    return "{:.2g}".format(valore_arrotondato).replace('.', ',')
-
-
-def stringify_ingrediente(ingrediente, dosi):
-    valore = ingrediente.get('quantita', {}).get('valore', 0) * dosi
-
-    if valore in (0, 1):
-        template = "{u} {nome}"
-    else:
-        template = "{v}{u} {nome}"
-    if ingrediente.get('annotazioni', '') != '':
-        template += " ({ann})"
-
-    return template.format(v=stringify_quantita(valore),
-                           u=ingrediente.get('quantita', {}).get('unita', ''),
-                           nome=ingrediente.get('nome', ''),
-                           ann=ingrediente.get('annotazioni', ''))
-
-
-def stringify_ingredienti(lista, dosi):
-    return '\n'.join(["- {}".format(stringify_ingrediente(i, dosi)) for i in lista])
-
-
-def stringify_variante(variante, dosi):
-    text_variante = "Variante\n"
-    if len(variante.get('ingredienti', [])) > 0:
-        text_ingredienti = "<i>Ingredienti:</i>\n{}\n".format(
-            stringify_ingredienti(variante.get('ingredienti', []), dosi)
-        )
-        text_variante += text_ingredienti
-    if len(variante.get('procedura', '')) > 1:
-        text_procedura = "<i>Procedura:</i>\n{}\n".format(variante.get('procedura'))
-        text_variante += text_procedura
-    return text_variante
-
-
-def stringify_parte(parte, dosi, con_nome=False):
-    text_ingredienti = "<i>Ingredienti:</i>\n{}\n".format(stringify_ingredienti(
-        parte.get('ingredienti', []), dosi))
-    if len(parte.get('procedura', '')) > 0:
-        text_procedura = "<i>Procedura:</i>\n{}\n".format(parte.get('procedura'))
-    else:
-        text_procedura = ''
-    text_varianti = '\n'.join([stringify_variante(v, dosi) for v in parte.get('varianti')])
-
-    if con_nome:
-        return "<b>per {}</b>:\n{}{}\n{}".format(parte.get('nome', 'questa parte'),
-                                                 text_ingredienti, text_procedura, text_varianti)
-    else:
-        return "{}{}\n{}".format(text_ingredienti, text_procedura, text_varianti)
-
-
-def stringify_parti(parti, dosi):
-    if len(parti) == 0:
-        return ''
-    elif len(parti) == 1:
-        return stringify_parte(parti[0], dosi)
-    else:
-        return '\n'.join([stringify_parte(p, dosi, True) for p in parti])
-
-
-def stringify_ricetta(ricetta, dosi=1):
-    text_titolo = ricetta.get('titolo', 'Titolo')
-    text_corpo = stringify_parti(ricetta.get('parti', []), dosi)
-    fonte = ricetta.get('fonte', '')
-    if fonte == '':
-        text_fonte = ''
-    else:
-        text_fonte = '\n  <i>Fonte: {}</i>'.format(fonte)
-
-    return "<b>{}</b>:\n{}{}".format(text_titolo, text_corpo, text_fonte)
 
 
 def get_close_match(token, dictionary):
@@ -207,7 +121,7 @@ async def id_callback(update, context):
         context.chat_data['dosi'] = 4
         dosi = 4
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text=stringify_ricetta(recipe, dosi=dosi))
+                             text=stringify.ricetta(recipe, dosi=dosi))
 
 
 async def dosi_callback(update, context):

@@ -127,17 +127,12 @@ def query_ricette(**kwargs):
             for r in catalogo if do_pass_filter(r)]
 
 
-def query_by_id(id):
+def query_by_id(id_ricetta):
     with open(catalogo_file) as c_file:
         catalogo = json.load(c_file)
 
-    ricetta = [r for r in catalogo if r.get('id', '###') == id]
+    ricetta = [r for r in catalogo if r.get('id', '###') == id_ricetta]
     if len(ricetta) > 1:
         raise KeyError('Id collision on {}'.format(catalogo_file))
 
     return next(iter(ricetta), None)
-
-
-def query_mese(mese=datetime.date.today().strftime('%b')):
-    # TODO: as decorator
-    pass
